@@ -13,9 +13,9 @@ const Header = () => {
         <nav className="hidden md:flex space-x-6">
           <Link to="/" className="text-lg font-medium hover:text-yellow-300 transition">Home</Link>
           <Link to="/Game" className="text-lg font-medium hover:text-yellow-300 transition">Games</Link>
-          <a href="#leaderboard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</a>
+          <Link to="/LeaderBoard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</Link>
           <a href="#about" className="text-lg font-medium hover:text-yellow-300 transition">About</a>
-          <a href="#profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</a>
+          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>
         </nav>
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
