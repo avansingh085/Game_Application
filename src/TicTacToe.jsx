@@ -55,17 +55,70 @@ const TicTacToe = ({ isOffline }) => {
     }
   };
 
-  const makeComputerMove = () => {
-    const emptyCells = board
-      .map((cell, index) => (cell === null ? index : null))
-      .filter((x) => x !== null);
+  const makeOptimalComputerMove = () => {
+    if (winner || board.every((cell) => cell !== null)) return;
 
-    if (emptyCells.length > 0) {
-      const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    const bestMove = findBestMove(board);
+    if (bestMove !== -1) {
       const newBoard = [...board];
-      newBoard[randomMove] = 'O';
+      newBoard[bestMove] = 'O';
       setBoard(newBoard);
       setIsXTurn(true);
+    }
+  };
+
+  const findBestMove = (board) => {
+    let bestScore = -Infinity;
+    let move = -1;
+
+    board.forEach((cell, index) => {
+      if (cell === null) {
+        board[index] = 'O'; // Simulate the computer's move
+        const score = minimax(board, 0, false);
+        board[index] = null; // Undo the move
+
+        if (score > bestScore) {
+          bestScore = score;
+          move = index;
+        }
+      }
+    });
+
+    return move;
+  };
+
+  const minimax = (board, depth, isMaximizing) => {
+    const win = calculateWinner(board);
+    if (win === 'O') return 10 - depth;
+    if (win === 'X') return depth - 10;
+    if (board.every((cell) => cell !== null)) return 0;
+
+    if (isMaximizing) {
+      let bestScore = -Infinity;
+
+      board.forEach((cell, index) => {
+        if (cell === null) {
+          board[index] = 'O'; // Simulate the computer's move
+          const score = minimax(board, depth + 1, false);
+          board[index] = null; // Undo the move
+
+          bestScore = Math.max(score, bestScore);
+        }
+      });
+      return bestScore;
+    } else {
+      let bestScore = Infinity;
+
+      board.forEach((cell, index) => {
+        if (cell === null) {
+          board[index] = 'X'; // Simulate the player's move
+          const score = minimax(board, depth + 1, true);
+          board[index] = null; // Undo the move
+
+          bestScore = Math.min(score, bestScore);
+        }
+      });
+      return bestScore;
     }
   };
 
@@ -74,7 +127,7 @@ const TicTacToe = ({ isOffline }) => {
     if (win) {
       setWinner(win);
     } else if (!isXTurn && !winner && !isOnline) {
-      makeComputerMove();
+      makeOptimalComputerMove();
     }
   }, [board, isXTurn, winner, isOnline]);
 
@@ -120,7 +173,6 @@ const TicTacToe = ({ isOffline }) => {
         )}
       </div>
 
-     
       <div className="flex space-x-6 mb-8">
         <button
           onClick={() => {
@@ -146,7 +198,6 @@ const TicTacToe = ({ isOffline }) => {
         </button>
       </div>
 
-     
       <div className="grid grid-cols-3 gap-4 w-72 mb-8">
         {board.map((cell, index) => (
           <div
@@ -161,7 +212,6 @@ const TicTacToe = ({ isOffline }) => {
         ))}
       </div>
 
-     
       {!winner && board.every((cell) => cell !== null) && (
         <h2 className="text-2xl font-semibold text-white mt-4">It's a Draw!</h2>
       )}
