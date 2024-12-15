@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Header from './header'; // Ensure the file name matches the casing here
+import Header from './header'; 
 import Game from './Game';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -8,6 +8,7 @@ import GameHome from './Home'
 import LeaderBoard from './LeaderBoard';
 import Profile from './Profile';
 import Chess from './Chess';
+import About from './About';
 function App() {
   return (
     <BrowserRouter>
@@ -19,6 +20,7 @@ function App() {
         <Route path="/Game" element={<Game />} />
         <Route path="/Game/TicTacToe" element={<TicTacToe  isOffline={true}/>} />
         <Route path="/Game/Chess" element={<Chess/>}/>
+        <Route path="/About" element={<About/>}/>
         <Route path="/LeaderBoard" element={<LeaderBoard/>} />
         <Route path="/Profile" element={<Profile/>}/>
       </Routes>
