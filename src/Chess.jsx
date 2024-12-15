@@ -20,7 +20,7 @@ const getChessSymbol = (piece) => {
     B: "♗", // White Bishop
     Q: "♕", // White Queen
     K: "♔", // White King
-    p: "♟", // Black Pawn
+    p: "♙",  
     r: "♜", // Black Rook
     n: "♞", // Black Knight
     b: "♝", // Black Bishop

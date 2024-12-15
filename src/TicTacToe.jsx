@@ -133,7 +133,7 @@ const TicTacToe = ({ isOffline }) => {
 
   useEffect(() => {
     if (isOnline) {
-      const newSocket = io('http://localhost:3001');
+      const newSocket = io('https://beautiful-raindrop-5caa35.netlify.app');
       setSocket(newSocket);
 
       newSocket.emit('join');
