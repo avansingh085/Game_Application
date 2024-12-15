@@ -28,12 +28,12 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-purple-700 shadow-md">
           <nav className="flex flex-col space-y-4 p-4">
-            <a href="#home" className="text-lg font-medium hover:text-yellow-300 transition">Home</a>
-            <a href="#games" className="text-lg font-medium hover:text-yellow-300 transition">Games</a>
-            <a href="#leaderboard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</a>
-            <a href="#about" className="text-lg font-medium hover:text-yellow-300 transition">About</a>
-            <a href="#profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</a>
-          </nav>
+          <Link to="/" className="text-lg font-medium hover:text-yellow-300 transition">Home</Link>
+          <Link to="/Game" className="text-lg font-medium hover:text-yellow-300 transition">Games</Link>
+          <Link to="/LeaderBoard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</Link>
+          <Link to="/About" className="text-lg font-medium hover:text-yellow-300 transition">About</Link>
+          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>
+      </nav>
         </div>
       )}
     </header>
