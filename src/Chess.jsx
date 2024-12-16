@@ -36,8 +36,47 @@ const ChessGame = () => {
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [turn, setTurn] = useState("b");
   const [validMove, setValidMove] = useState([]);
-
-  const getValidMove = (row, col) => {
+  const checkIsKingIsSafe=(fromRow,fromCol,toRow,toCol)=>{
+    let kingRow=0,kingCol=0;
+     for(let i=0;i<8;i++)
+     {
+         for(let j=0;j<8;j++)
+         {
+             if(board[i][j]!==""&&board[i][j][1]===turn&&(board[i][j][0]==="k"||board[i][j][0]==="K"))
+             {
+                       kingRow=i;
+                       kingCol=j;
+             }
+         }
+     }
+     let newBoard=[];
+     for(let i=0;i<8;i++)
+     {
+           newBoard[i]=[...board[i]]
+     }
+    
+    newBoard[toRow][toCol]=board[fromRow][fromCol];
+    newBoard[fromRow][fromCol]="";
+     for(let i=0;i<8;i++)
+     {
+        for(let j=0;j<8;j++)
+        {
+            if(newBoard[i][j]!==""&&newBoard[i][j][1]!==turn)
+            {
+                let MoveCheck=getValidMove(i,j,true);
+                for(let k=0;k<MoveCheck.length;k++)
+                {
+                    if(MoveCheck[k][0]===kingRow&&MoveCheck[k][1]==kingCol)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+     }
+     return true;
+}
+  const getValidMove =async (row, col,isOnlyMoveData) => {
     const Move = []; 
     console.log(board[row][col], 'pppp');
 
@@ -244,15 +283,26 @@ const ChessGame = () => {
             }
         }
     }
+    if(isOnlyMoveData)
+        return Move;
     console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", Move);
-    setValidMove(Move);
+    let newMove=[];
+    for(let i=0;i<Move.length;i++)
+    {
+        if(checkIsKingIsSafe(Move[i][0],Move[i][1],row,col))
+        {
+            newMove.push(Move[i]);
+        }
+    }
+    setValidMove(newMove);
     return;
 };
 
 
   const handleSelect = (row, col) => {
     let isRightMove = false;
-
+    let newValidMove=[...validMove];
+   
     
     for (let i = 0; i < validMove.length; i++) {
       if (validMove[i][0] === row && validMove[i][1] === col) {
@@ -276,7 +326,7 @@ const ChessGame = () => {
     } else {
       if (board[row][col] !== "" && board[row][col][1] === turn) {
         setSelectedPiece({ piece: board[row][col], row, col });
-        getValidMove(row, col);
+        getValidMove(row, col,false);
       }
     }
   };
