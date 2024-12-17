@@ -1,94 +1,52 @@
-import React, { useEffect, useState } from "react";
-import ShowOption from './showOptionChess';
-const initializeBoard = () => {
-  return [
-    ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
-    Array(8).fill("pb"),
-    Array(8).fill(""),
-    Array(8).fill(""),
-    Array(8).fill(""),
-    Array(8).fill(""),
-    Array(8).fill("Pw"),
-    ["Rw", "Nw", "Bw", "Qw", "Kw", "Bw", "Nw", "Rw"], 
-  ];
-};
-
-const getChessSymbol = (piece) => {
-  const symbols  = {
-    P: "♙", // White Pawn
-    R: "♖", // White Rook
-    N: "♘", // White Knight
-    B: "♗", // White Bishop
-    Q: "♕", // White Queen
-    K: "♔", // White King
-    p: "♙",  
-    r: "♜", // Black Rook
-    n: "♞", // Black Knight
-    b: "♝", // Black Bishop
-    q: "♛", // Black Queen
-    k: "♚", // Black King
-  };
-  
-  return symbols[piece] || "";
-};
-
-const ChessGame = () => {
-  const [chessBoard, setBoard] = useState(initializeBoard());
-  const [selectedPiece, setSelectedPiece] = useState(null);
-  const [turn, setTurn] = useState("b");
-  const [validMove, setValidMove] = useState([]);
-  const [showOptionPawn,setShowOptionPawn]=useState([false,""]);
  
   const checkIsKingIsSafe=async(fromRow,fromCol,toRow,toCol)=>{
-    let kingRow=0,kingCol=0;
-     for(let i=0;i<8;i++)
-     {
+     let kingRow=0,kingCol=0;
+      for(let i=0;i<8;i++)
+      {
+          for(let j=0;j<8;j++)
+          {
+              if(chessBoard[i][j]!==""&&chessBoard[i][j][1]===turn&&(chessBoard[i][j][0]==="k"||chessBoard[i][j][0]==="K"))
+              {
+                        kingRow=i;
+                        kingCol=j;
+              }
+          }
+      }
+      let newBoard=[];
+      for(let i=0;i<8;i++)
+      {
+            newBoard[i]=[...chessBoard[i]]
+      }
+      
+     newBoard[toRow][toCol]=chessBoard[fromRow][fromCol];
+     newBoard[fromRow][fromCol]="";
+     console.log(newBoard)
+      for(let i=0;i<8;i++)
+      {
          for(let j=0;j<8;j++)
          {
-             if(chessBoard[i][j]!==""&&chessBoard[i][j][1]===turn&&(chessBoard[i][j][0]==="k"||chessBoard[i][j][0]==="K"))
+             if(newBoard[i][j]!==""&&newBoard[i][j][1]!==turn)
              {
-                       kingRow=i;
-                       kingCol=j;
+                 
+                 let MoveCheck=await getValidMove(i,j,true,newBoard);
+                 
+                 for(let k=0;k<MoveCheck.length;k++)
+                 {
+                     if(MoveCheck[k][0]===kingRow&&MoveCheck[k][1]==kingCol)
+                     {
+                        
+                         return false;
+                     }
+                 }
              }
          }
-     }
-     let newBoard=[];
-     for(let i=0;i<8;i++)
-     {
-           newBoard[i]=[...chessBoard[i]]
-     }
-     
-    newBoard[toRow][toCol]=chessBoard[fromRow][fromCol];
-    newBoard[fromRow][fromCol]="";
-    console.log(newBoard)
-     for(let i=0;i<8;i++)
-     {
-        for(let j=0;j<8;j++)
-        {
-            if(newBoard[i][j]!==""&&newBoard[i][j][1]!==turn)
-            {
-                
-                let MoveCheck=await getValidMove(i,j,true,newBoard);
-                
-                for(let k=0;k<MoveCheck.length;k++)
-                {
-                    if(MoveCheck[k][0]===kingRow&&MoveCheck[k][1]==kingCol)
-                    {
-                       
-                        return false;
-                    }
-                }
-            }
-        }
-     }
-     return true;
-}
-  const getValidMove =async (row, col,isOnlyMoveData,board) => {
+      }
+      return true;
+ }
+ const getValidMove =async (row, col,isOnlyMoveData,board) => {
     const Move = []; 
-    console.log(board[row][col],row,col,selectedPiece)
-    
     if (board[row][col][0] === 'q' || board[row][col][0] === 'Q') {
-        
+       
         for (let i = col + 1; i < 8; i++) {
             if (board[row][i] === "") {
                 Move.push([row, i]);
@@ -311,7 +269,6 @@ const ChessGame = () => {
             }
         }
     }
-    
     if(isOnlyMoveData)
         return Move;
    
@@ -328,119 +285,4 @@ const ChessGame = () => {
     await setValidMove(newMove);
     return;
 };
-const winnerConditionCheck=async ()=>{
-
-}
-  const handleSelect =async (row, col) => {
-  
-    let isRightMove = false;
-    let newValidMove=[...validMove];
-   
-    
-    for (let i = 0; i < validMove.length; i++) {
-      if (validMove[i][0] === row && validMove[i][1] === col) {
-        isRightMove = true;
-        break;
-      }
-    }
-
-    if (isRightMove && selectedPiece) {
-      
-      const newBoard = [...chessBoard];
-      newBoard[row][col] = selectedPiece.piece;
-      if(newBoard[row][col][0]==="p"&&row===7||newBoard[row][col][0]==="P"&&row===0)
-      {
-            await setShowOptionPawn([true,"",row,col,newBoard]);
-      }
-      else{
-        const nextTurn = turn === "w" ? "b" : "w";
-       await setTurn(nextTurn);
-      }
-      newBoard[selectedPiece.row][selectedPiece.col] = "";
-     await  setBoard(newBoard);
-     await setSelectedPiece(null);
-     await setValidMove([]);
-    } else {
-      if (chessBoard[row][col] !== "" && chessBoard[row][col][1] === turn) {
-      await  setSelectedPiece({ piece: chessBoard[row][col], row, col });
-        console.log(row,col,selectedPiece);
-      await  getValidMove(row,col,false,chessBoard);
-      }
-      else
-      {
-      await setSelectedPiece(null);
-       await setValidMove([]);
-      }
-      
-    }
-  };
-
-  return (
-    <div className="flex flex-col items-center bg-gray-800 min-h-screen text-white p-4">
-   
-    <h1 className="text-3xl font-bold mb-4">Chess Game</h1>
-    <div className="flex justify-center space-x-4 mb-6">
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Play Online
-      </button>
-      <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Play Offline
-      </button>
-      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-        Play vs Computer
-      </button>
-    </div>
-  
-   
-    <div className="grid grid-cols-8 w-96 mx-auto rounded-lg shadow-lg">
-      {chessBoard.map((row, rowIndex) =>
-        row.map((cell, colIndex) => {
-          const isWhiteSquare = (rowIndex + colIndex) % 2 === 0;
-          const bgColor = isWhiteSquare ? "bg-pink-200" : "bg-purple-600";
-          const pieceSymbol = cell ? getChessSymbol(cell[0]) : "";
-          const isValidMove = validMove.some(
-            ([validRow, validCol]) => validRow === rowIndex && validCol === colIndex
-          );
-          const highlight = isValidMove ? "bg-yellow-400" : "";
-  
-          
-          const isPlayerPiece = cell && cell[1] === turn;  
-          const isOpponentPiece = cell && cell[1] !== turn; 
-  
-          
-          const pieceColor = isPlayerPiece ? "text-white" : isOpponentPiece ? "text-black" : "";
-  
-          return (
-            <div
-              key={`${rowIndex}-${colIndex}`}
-              className={`h-12 w-12 flex text-4xl items-center justify-center ${bgColor} ${highlight} border-gray-900`}
-              onClick={async () => await handleSelect(rowIndex, colIndex)}
-              style={{
-                transition: "all 0.3s ease",
-                boxShadow: isValidMove ? "0 0 10px 2px rgba(255, 255, 0, 0.7)" : "",
-                cursor: "pointer",
-              }}
-            >
-              <span className={pieceColor}>{pieceSymbol}</span>
-            </div>
-          );
-        })
-      )}
-    </div>
-  
-    {/* Footer Section */}
-    <div className="mt-6">
-      <button
-        className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-        onClick={() => setBoard(initializeBoard())}
-      >
-        Restart Game
-      </button>
-    </div>
-     {showOptionPawn[0] ? <ShowOption  setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} turn={turn} setBoard={setBoard} setTurn={setTurn}/> : null}
-  </div>
-  
-  );
-};
-
-export default ChessGame;
+export default getValidMove
