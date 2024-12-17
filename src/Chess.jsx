@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ShowOption from './showOptionChess';
 const initializeBoard = () => {
   return [
     ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
@@ -32,17 +33,18 @@ const getChessSymbol = (piece) => {
 };
 
 const ChessGame = () => {
-  const [board, setBoard] = useState(initializeBoard());
+  const [chessBoard, setBoard] = useState(initializeBoard());
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [turn, setTurn] = useState("b");
   const [validMove, setValidMove] = useState([]);
-  const checkIsKingIsSafe=(fromRow,fromCol,toRow,toCol)=>{
+  const [showOptionPawn,setShowOptionPawn]=useState([false,""]);
+  const checkIsKingIsSafe=async(fromRow,fromCol,toRow,toCol)=>{
     let kingRow=0,kingCol=0;
      for(let i=0;i<8;i++)
      {
          for(let j=0;j<8;j++)
          {
-             if(board[i][j]!==""&&board[i][j][1]===turn&&(board[i][j][0]==="k"||board[i][j][0]==="K"))
+             if(chessBoard[i][j]!==""&&chessBoard[i][j][1]===turn&&(chessBoard[i][j][0]==="k"||chessBoard[i][j][0]==="K"))
              {
                        kingRow=i;
                        kingCol=j;
@@ -52,22 +54,26 @@ const ChessGame = () => {
      let newBoard=[];
      for(let i=0;i<8;i++)
      {
-           newBoard[i]=[...board[i]]
+           newBoard[i]=[...chessBoard[i]]
      }
-    
-    newBoard[toRow][toCol]=board[fromRow][fromCol];
+     
+    newBoard[toRow][toCol]=chessBoard[fromRow][fromCol];
     newBoard[fromRow][fromCol]="";
+    console.log(newBoard)
      for(let i=0;i<8;i++)
      {
         for(let j=0;j<8;j++)
         {
             if(newBoard[i][j]!==""&&newBoard[i][j][1]!==turn)
             {
-                let MoveCheck=getValidMove(i,j,true);
+                
+                let MoveCheck=await getValidMove(i,j,true,newBoard);
+                
                 for(let k=0;k<MoveCheck.length;k++)
                 {
                     if(MoveCheck[k][0]===kingRow&&MoveCheck[k][1]==kingCol)
                     {
+                       
                         return false;
                     }
                 }
@@ -76,10 +82,8 @@ const ChessGame = () => {
      }
      return true;
 }
-  const getValidMove =async (row, col,isOnlyMoveData) => {
+  const getValidMove =async (row, col,isOnlyMoveData,board) => {
     const Move = []; 
-    console.log(board[row][col], 'pppp');
-
     if (board[row][col][0] === 'q' || board[row][col][0] === 'Q') {
         // Share row
         for (let i = col + 1; i < 8; i++) {
@@ -258,47 +262,68 @@ const ChessGame = () => {
                 }
             }
         } else if (board[row][col][0] === 'p') {
+            let cut=0;
             if (row + 1 < 8) {
-                if (col - 1 >= 0 && board[row + 1][col - 1][1] !== board[row][col][1]) {
+                if (col - 1 >= 0 &&board[row + 1][col - 1] !== ""&& board[row + 1][col - 1][1] !== board[row][col][1]) {
                     Move.push([row + 1, col - 1]);
+                    cut++;
                 }
-                if (col + 1 < 8 && board[row + 1][col + 1][1] !== board[row][col][1]) {
+                if (col + 1 < 8 &&board[row + 1][col + 1] !==""&&board[row + 1][col + 1][1] !== board[row][col][1]) {
                     Move.push([row + 1, col + 1]);
+                    cut++;
                 }
-                if (board[row + 1][col] === "") {
+                if (board[row + 1][col] === ""&&cut===0) {
                     Move.push([row + 1, col]);
                 }
             }
         } else if (board[row][col][0] === 'P') {
+            let cut=0;
             if (row - 1 >= 0) {
-                if (col - 1 >= 0 && board[row - 1][col - 1][1] !== board[row][col][1]) {
+                if (col - 1 >= 0 &&board[row - 1][col - 1]!==""&&board[row - 1][col - 1][1] !== board[row][col][1]) {
                     Move.push([row - 1, col - 1]);
+                    cut++;
                 }
-                if (col + 1 < 8 && board[row - 1][col + 1][1] !== board[row][col][1]) {
+                if (col + 1 < 8 &&board[row - 1][col + 1]!==""&&board[row - 1][col + 1][1] !== board[row][col][1]) {
                     Move.push([row - 1, col + 1]);
+                    cut++;
                 }
-                if (board[row - 1][col] === "") {
+                if (board[row - 1][col] === ""&&cut===0) {
                     Move.push([row - 1, col]);
                 }
+            }
+        }
+        else
+        {
+            if(board[row][col][0]==="k"||board[row][col][0]==="K")
+            {
+                let kingMove=[[-1,1],[-1,-1],[1,1],[1,-1],[1,0],[-1,0],[0,-1],[0,1]];
+                   for(let k=0;k<kingMove.length;k++)
+                   {
+                          let c=col+kingMove[k][1];
+                          let r=row+kingMove[k][0];
+                          if (r >= 0 && c >= 0 && r < 8 && c < 8 && board[row][col][1] !== board[r][c][1]) {
+                            Move.push([r, c]);
+                        }
+                   }
             }
         }
     }
     if(isOnlyMoveData)
         return Move;
-    console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH", Move);
+   
     let newMove=[];
     for(let i=0;i<Move.length;i++)
     {
-        if(checkIsKingIsSafe(Move[i][0],Move[i][1],row,col))
+        if(chessBoard[Move[i][0]][Move[i][1]][0]==="k"||chessBoard[Move[i][0]][Move[i][1]][0]==="K")
+            continue;
+        if(await checkIsKingIsSafe(Move[i][0],Move[i][1],row,col))
         {
             newMove.push(Move[i]);
         }
     }
-    setValidMove(newMove);
+    await setValidMove(newMove);
     return;
 };
-
-
   const handleSelect = (row, col) => {
     let isRightMove = false;
     let newValidMove=[...validMove];
@@ -313,20 +338,30 @@ const ChessGame = () => {
 
     if (isRightMove && selectedPiece) {
       
-      const newBoard = [...board];
+      const newBoard = [...chessBoard];
       newBoard[row][col] = selectedPiece.piece;
+      if(newBoard[row][col][0]==="p"&&row===7||newBoard[row][col][0]==="P"&&row===0)
+      {
+            
+             setShowOptionPawn([true,"",row,col,newBoard]);
+              
+      }
+      else{
+        const nextTurn = turn === "w" ? "b" : "w";
+        setTurn(nextTurn);
+      }
       newBoard[selectedPiece.row][selectedPiece.col] = "";
       setBoard(newBoard);
 
     
-      const nextTurn = turn === "w" ? "b" : "w";
-      setTurn(nextTurn);
+     
+      
       setSelectedPiece(null);
       setValidMove([]);
     } else {
-      if (board[row][col] !== "" && board[row][col][1] === turn) {
-        setSelectedPiece({ piece: board[row][col], row, col });
-        getValidMove(row, col,false);
+      if (chessBoard[row][col] !== "" && chessBoard[row][col][1] === turn) {
+        setSelectedPiece({ piece: chessBoard[row][col], row, col });
+        getValidMove(row, col,false,chessBoard);
       }
     }
   };
@@ -349,15 +384,15 @@ const ChessGame = () => {
   
    
     <div className="grid grid-cols-8 w-96 mx-auto rounded-lg shadow-lg">
-      {board.map((row, rowIndex) =>
+      {chessBoard.map((row, rowIndex) =>
         row.map((cell, colIndex) => {
           const isWhiteSquare = (rowIndex + colIndex) % 2 === 0;
-          const bgColor = isWhiteSquare ? "bg-gray-200" : "bg-green-700";
+          const bgColor = isWhiteSquare ? "bg-pink-200" : "bg-purple-600";
           const pieceSymbol = cell ? getChessSymbol(cell[0]) : "";
           const isValidMove = validMove.some(
             ([validRow, validCol]) => validRow === rowIndex && validCol === colIndex
           );
-          const highlight = isValidMove ? "bg-yellow-300" : "";
+          const highlight = isValidMove ? "bg-yellow-400" : "";
   
           
           const isPlayerPiece = cell && cell[1] === turn;  
@@ -393,6 +428,7 @@ const ChessGame = () => {
         Restart Game
       </button>
     </div>
+     {showOptionPawn[0] ? <ShowOption  setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} turn={turn} setBoard={setBoard} setTurn={setTurn}/> : null}
   </div>
   
   );
