@@ -1,7 +1,7 @@
 function ShowOptionPawns({ setShowOptionPawn, showOptionPawn, turn, setBoard, setTurn }) {
 
     const handlerPawn = (piece) => {
-      let newBoard = [...showOptionPawn[4]];
+      let newBoard = showOptionPawn[4].map(row => [...row]);;
       let row = showOptionPawn[2];
       let col = showOptionPawn[3];
   
