@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-
+import Progress from '../components/Progress'
 const Profile = () => {
-  // Fake user data
   const userData = {
     name: 'John Doe',
     email: 'john.doe@example.com',
@@ -11,14 +10,14 @@ const Profile = () => {
     losses: 70,
     rank: 'Gold',
   };
-
+  const [showProgress,setShowProgress]=useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(userData.name);
   const [email, setEmail] = useState(userData.email);
   const [avatar, setAvatar] = useState(userData.avatar);
 
   const handleSaveChanges = () => {
-    // Simulate saving changes (you can integrate with an API for this)
+  
     setIsEditing(false);
     alert('Profile updated!');
   };
@@ -27,8 +26,6 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-6">Your Profile</h1>
-
-        {/* Avatar and Name Section */}
         <div className="flex flex-col items-center mb-6">
           <img
             src={avatar}
@@ -52,7 +49,7 @@ const Profile = () => {
           )}
         </div>
 
-        {/* Name and Email */}
+    
         <div className="mb-4">
           <label htmlFor="name" className="text-lg text-gray-800">Name</label>
           <input
@@ -77,7 +74,6 @@ const Profile = () => {
           />
         </div>
 
-        {/* Game Stats */}
         <div className="mb-6">
           <p className="text-lg text-gray-800"><strong>Games Played:</strong> {userData.gamesPlayed}</p>
           <p className="text-lg text-gray-800"><strong>Wins:</strong> {userData.wins}</p>
@@ -114,6 +110,8 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      
+         {showProgress ? <Progress  setShowProgress={setShowProgress} showProgress={showProgress}/> :<button className="h-14 w-80 bg-green-600 rounded-lg" onClick={()=>setShowProgress(!showProgress)}>Progress Show</button>}
     </div>
   );
 };

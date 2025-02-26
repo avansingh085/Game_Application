@@ -13,7 +13,7 @@ const GameHome = ({ setIsOnline, resetGame }) => {
       </p>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-        {/* Tic Tac Toe Game Card */}
+        
         <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 ease-in-out hover:scale-105">
           <div className="p-6 text-center">
             <h2 className="text-3xl font-semibold text-indigo-600 mb-4">Tic Tac Toe</h2>
@@ -29,8 +29,6 @@ const GameHome = ({ setIsOnline, resetGame }) => {
             </button>
           </div>
         </div>
-
-        {/* Another Game Card (for example, Snake) */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 ease-in-out hover:scale-105">
           <div className="p-6 text-center">
             <h2 className="text-3xl font-semibold text-green-600 mb-4">Snake Game</h2>
@@ -44,7 +42,6 @@ const GameHome = ({ setIsOnline, resetGame }) => {
           </div>
         </div>
 
-        {/* Another Game Card (for example, Connect Four) */}
         <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-all duration-300 ease-in-out hover:scale-105">
           <div className="p-6 text-center">
             <h2 className="text-3xl font-semibold text-yellow-600 mb-4">Connect Four</h2>
@@ -58,7 +55,7 @@ const GameHome = ({ setIsOnline, resetGame }) => {
           </div>
         </div>
 
-        {/* More game cards can be added here */}
+       
       </div>
 
       <div className="text-center text-white font-medium text-lg">

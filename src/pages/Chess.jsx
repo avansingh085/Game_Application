@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import ShowOption from './showOptionChess';
+import ShowOption from '../components/showOptionChess';
+import io from "socket.io-client";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const initializeBoard = () => {
   return [
     ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
@@ -35,9 +38,16 @@ const getChessSymbol = (piece) => {
 const ChessGame = () => {
   const [chessBoard, setBoard] = useState(initializeBoard());
   const [selectedPiece, setSelectedPiece] = useState(null);
+  const [socket,setSocket]=useState(null);
+  const [online,setOnline]=useState(false);
+  const [onlineTurn,setOnlineTurn]=useState('');
+  const [reJoin,setReJoin]=useState(false);
+  const [gameId,setGameId]=useState(null);
   const [turn, setTurn] = useState("b");
   const [validMove, setValidMove] = useState([]);
   const [showOptionPawn,setShowOptionPawn]=useState([false,""]);
+  const [userId,setUserId]=useState("");
+  const [isMove,setisMove]=useState(0);
   useEffect(() => {
     if (selectedPiece) {
       getValidMove(selectedPiece.row, selectedPiece.col, false, chessBoard);
@@ -53,6 +63,7 @@ const ChessGame = () => {
   const GameWin=async ()=>{
 
   }
+ 
   const checkIsKingIsSafe = async (fromRow, fromCol, toRow, toCol) => {
     let kingRow = -1, kingCol = -1;
     
@@ -68,7 +79,6 @@ const ChessGame = () => {
         kingRow = toRow;
         kingCol = toCol;
     } else {
-        
         for (let i = 0; i < 8; i++) {
             for (let j = 0; j < 8; j++) {
                 if (newBoard[i][j] !== "" && newBoard[i][j][1] === turn &&
@@ -256,66 +266,107 @@ const getValidMove = async (row, col, isOnlyMoveData, board) => {
 const winnerConditionCheck=async()=>{
 
 }
-  const handleSelect =async(row, col) => {
-  
-    let isRightMove = false;
-    let newValidMove=validMove.map(row => [...row]);;
-   
+useEffect(() => {
+  if (!online || !userId) return;
 
-    for (let i = 0; i < validMove.length; i++) {
-      if (validMove[i][0] === row && validMove[i][1] === col) {
-        isRightMove = true;
-        break;
-      }
-    }
-console.log(chessBoard)
-    if (isRightMove && selectedPiece) {
-      
-      const newBoard = chessBoard.map(row => [...row]);;
-      newBoard[row][col] = selectedPiece.piece;
-      if(newBoard[row][col][0]==="p"&&row===7||newBoard[row][col][0]==="P"&&row===0)
-      {
-             setShowOptionPawn([true,"",row,col,newBoard]);
-      }
-      else{
-        const nextTurn = turn === "w" ? "b" : "w";
-        setTurn(nextTurn);
-      }
-      newBoard[selectedPiece.row][selectedPiece.col] = "";
-      setBoard(newBoard);
-      setSelectedPiece(null);
-      setValidMove([]);
-    } else {
-      if (chessBoard[row][col] !== "" && chessBoard[row][col][1] === turn) {
-       setSelectedPiece({ piece: chessBoard[row][col], row, col });
-       await getValidMove(row,col,false,chessBoard);
-       console.log(validMove,"AVAN SINGH")
-      }
-      else
-      {
-      setSelectedPiece(null);
-       setValidMove([]);
-      }
-      
+  const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: userId, gameType: "TIC" } });
+  setSocket(newSocket);
+
+  newSocket.emit("join", { board: initializeBoard() });
+
+  newSocket.on("waiting", (message) => toast.info(message));
+  newSocket.on("startGame", ({ gameId, players }) => {
+    const assignedSymbol = players.X.socketId === newSocket.id ? "b" : "w";
+    setOnlineTurn(assignedSymbol)
+    setGameId(gameId);
+    toast.success(`Game started! You are ${assignedSymbol}`);
+  });
+
+  newSocket.on("move", ({ board: newBoard, symbol }) => {
+    setBoard(newBoard);
+    setTurn(symbol)
+  
+  });
+
+  newSocket.on("reset", () => {
+    setBoard(initializeBoard());
+  });
+
+  newSocket.on("opponentDisconnected", (message) => {
+    toast.error(message);
+    resetGame();
+    setIsOnline(false);
+  });
+
+  return () => {
+    if (newSocket) {
+      newSocket.disconnect();
     }
   };
+}, [online, userId]);
+
+console.log(turn,"  ",onlineTurn)
+const handleSelect = async (row, col) => {
+  if(online && onlineTurn !== turn) return;
+
+  let isRightMove = validMove.some(move => move[0] === row && move[1] === col);
+
+  if (isRightMove && selectedPiece) {
+    console.log("isWrite");
+    const newBoard = chessBoard.map(row => [...row]);
+    newBoard[row][col] = selectedPiece.piece;
+    const nextTurn = turn==='b' ? 'w' : 'b';
+   setTurn(nextTurn)
+     
+    if ((newBoard[row][col][0] === "p" && row === 7) || (newBoard[row][col][0] === "P" && row === 0)) {
+      setShowOptionPawn([true, "", row, col, newBoard]);
+    }
+
+    newBoard[selectedPiece.row][selectedPiece.col] = "";
+    setBoard(newBoard);
+    setSelectedPiece(null);
+    setValidMove([]);
+
+   setisMove((pre)=>pre+1);
+   
+     
+    
+  } else {
+    
+    if(chessBoard[row][col] !== "" && chessBoard[row][col][1] === turn) {
+      setSelectedPiece({ piece: chessBoard[row][col], row, col });
+      await getValidMove(row, col, false, chessBoard);
+      console.log(validMove, "Valid Moves");
+    } else {
+      setSelectedPiece(null);
+      setValidMove([]);
+    }
+  }
+
+};
+useEffect(()=>{
+ if(!socket)
+  return;
+  socket.emit("move", { symbol:turn,board:chessBoard, gameId });
+},[isMove])
+
   return (
     <div className="flex flex-col items-center bg-gray-800 min-h-screen text-white p-4">
    
     <h1 className="text-3xl font-bold mb-4">Chess Game</h1>
     <div className="flex justify-center space-x-4 mb-6">
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Play Online
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={(e)=>{e.stopPropagation(); setOnline(!online)}}>
+       {!online ? "Play Online" : "play Offline"}
       </button>
-      <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Play Offline
-      </button>
-      <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-        Play vs Computer
-      </button>
+     
+      { online ? <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+       rejoin
+      </button> : null
+    }
+
     </div>
   
-   
+      <input  className="mb-5 text-purple-400"  onChange={(e)=>setUserId(e.target.value)}/>
     <div className="grid grid-cols-8 w-full min-w-[300px] max-w-[600px] min-h-[300px] max-h-[600px] mx-auto gap-1">
   {chessBoard.map((row, rowIndex) =>
     row.map((cell, colIndex) => {
@@ -332,7 +383,6 @@ console.log(chessBoard)
 
       const pieceColor = cell[1]==="w" ? "text-white" :  "text-black" ;
 
-      // Dynamic font size based on cell size
       const pieceSize = 'text-4xl sm:text-5xl md:text-6xl';
 
       return (
@@ -351,7 +401,7 @@ console.log(chessBoard)
             className={`${pieceColor} font-bold ${pieceSize}`}
             style={{
               textShadow: "0 0 6px rgba(0, 0, 0, 0.5), 0 0 8px rgba(255, 255, 255, 0.8)",
-              fontFamily: "ChessFont, sans-serif", // You can use a specific chess font if you like
+              fontFamily: "ChessFont, sans-serif", 
             }}
           >
             {pieceSymbol}
@@ -365,13 +415,13 @@ console.log(chessBoard)
     <div className="mt-6 flex justify-center">
   <button
     className="bg-gradient-to-r from-purple-500 to-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:from-purple-600 hover:to-purple-800 hover:scale-105 transition-transform transform duration-300 ease-in-out"
-    onClick={async () => await setBoard(initializeBoard())}
+    onClick={async () =>{ await setBoard(initializeBoard()); if(online&&socket)socket?.emit('reset',{gameId,board:initializeBoard()})}}
   >
     🔄 Restart Game
   </button>
 </div>
 
-     {showOptionPawn[0] ? <ShowOption  setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} turn={turn} setBoard={setBoard} setTurn={setTurn}/> : null}
+     {showOptionPawn[0] ? <ShowOption  setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} turn={turn=='w' ? 'b': 'w' } setBoard={setBoard} setTurn={setTurn}/> : null}
   </div>
   
   );

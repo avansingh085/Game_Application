@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+   const isLogin=useSelector((state)=>state.isLogin);
   return (
     <header className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 m-0 p-0 text-white shadow-lg">
       <div className="container mx-auto p-4 flex justify-between items-center">
@@ -11,12 +12,13 @@ const Header = () => {
           <h1 className="text-3xl font-extrabold tracking-wide">GameZone</h1>
         </div>
         <nav className="hidden md:flex space-x-6">
-          <Link to="/" className="text-lg font-medium hover:text-yellow-300 transition">Home</Link>
+        <Link to="/" className="text-lg font-medium hover:text-yellow-300 transition">Home</Link>
           <Link to="/Game" className="text-lg font-medium hover:text-yellow-300 transition">Games</Link>
           <Link to="/LeaderBoard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</Link>
           <Link to="/About" className="text-lg font-medium hover:text-yellow-300 transition">About</Link>
-          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>
-        </nav>
+       {isLogin ?  <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>:
+          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Login</Link>
+      }   </nav>
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="md:hidden text-white focus:outline-none">
@@ -32,7 +34,10 @@ const Header = () => {
           <Link to="/Game" className="text-lg font-medium hover:text-yellow-300 transition">Games</Link>
           <Link to="/LeaderBoard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</Link>
           <Link to="/About" className="text-lg font-medium hover:text-yellow-300 transition">About</Link>
-          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>
+       {isLogin ?  <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>:
+          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Login</Link>
+      }
+     
       </nav>
         </div>
       )}
