@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-   const isLogin=useSelector((state)=>state.isLogin);
+   const isLogin=useSelector((state)=>state.auth.isLogin);
+   
   return (
     <header className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 m-0 p-0 text-white shadow-lg">
       <div className="container mx-auto p-4 flex justify-between items-center">
@@ -17,7 +18,7 @@ const Header = () => {
           <Link to="/LeaderBoard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</Link>
           <Link to="/About" className="text-lg font-medium hover:text-yellow-300 transition">About</Link>
        {isLogin ?  <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>:
-          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Login</Link>
+          <Link to="/Login" className="text-lg font-medium hover:text-yellow-300 transition">Login</Link>
       }   </nav>
         <button 
           onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -35,7 +36,7 @@ const Header = () => {
           <Link to="/LeaderBoard" className="text-lg font-medium hover:text-yellow-300 transition">Leaderboard</Link>
           <Link to="/About" className="text-lg font-medium hover:text-yellow-300 transition">About</Link>
        {isLogin ?  <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Profile</Link>:
-          <Link to="/Profile" className="text-lg font-medium hover:text-yellow-300 transition">Login</Link>
+          <Link to="/Login" className="text-lg font-medium hover:text-yellow-300 transition">Login</Link>
       }
      
       </nav>

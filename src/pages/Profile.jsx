@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
 import Progress from '../components/Progress'
+import { getUserID } from '../services/authService';
 const Profile = () => {
   const userData = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-    gamesPlayed: 150,
-    wins: 80,
-    losses: 70,
-    rank: 'Gold',
+    name: getUserID()
   };
   const [showProgress,setShowProgress]=useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(userData.name);
-  const [email, setEmail] = useState(userData.email);
-  const [avatar, setAvatar] = useState(userData.avatar);
+  
 
   const handleSaveChanges = () => {
   
@@ -27,26 +21,8 @@ const Profile = () => {
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-6">Your Profile</h1>
         <div className="flex flex-col items-center mb-6">
-          <img
-            src={avatar}
-            alt="User Avatar"
-            className="w-32 h-32 rounded-full border-4 border-indigo-500 mb-4"
-          />
-          {isEditing ? (
-            <input
-              type="file"
-              onChange={(e) => setAvatar(URL.createObjectURL(e.target.files[0]))}
-              className="hidden"
-              id="avatar-input"
-            />
-          ) : (
-            <label
-              htmlFor="avatar-input"
-              className="text-xl text-indigo-600 cursor-pointer hover:underline"
-            >
-              Change Avatar
-            </label>
-          )}
+          
+         
         </div>
 
     
@@ -63,22 +39,12 @@ const Profile = () => {
         </div>
 
         <div className="mb-4">
-          <label htmlFor="email" className="text-lg text-gray-800">Email</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={!isEditing}
-            className="w-full mt-2 p-3 border-2 border-gray-300 rounded-lg"
-          />
+          
         </div>
 
         <div className="mb-6">
-          <p className="text-lg text-gray-800"><strong>Games Played:</strong> {userData.gamesPlayed}</p>
-          <p className="text-lg text-gray-800"><strong>Wins:</strong> {userData.wins}</p>
-          <p className="text-lg text-gray-800"><strong>Losses:</strong> {userData.losses}</p>
-          <p className="text-lg text-gray-800"><strong>Rank:</strong> {userData.rank}</p>
+          
+          <p className="text-lg text-gray-800"><strong>score:0</strong></p>
         </div>
 
         {/* Edit and Save Buttons */}

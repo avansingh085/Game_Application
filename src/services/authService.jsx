@@ -7,6 +7,12 @@ export const setToken = (token) => {
   export const removeToken = () => {
     localStorage.removeItem('authToken');
   };
+  export const setUserID=(userId)=>{
+    localStorage.setItem("userId",userId);
+  }
+  export const getUserID=()=>{
+    localStorage.getItem("userId");
+  }
   export const isLoggedIn = () => {
     return !!getToken();
   };

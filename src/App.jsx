@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import Header from './components/header'; 
 import Game from './pages/Game';
 import { ToastContainer } from 'react-toastify';
@@ -9,47 +9,51 @@ import LeaderBoard from './pages/LeaderBoard';
 import Profile from './pages/Profile';
 import Chess from './pages/Chess';
 import About from './pages/About';
-// import VideoCall from './components/VideoCall';
-import { setToken ,getToken} from './services/authService';
-import { useDispatch } from 'react-redux';
+import { setToken, getToken } from './services/authService';
+import { useDispatch, useSelector } from 'react-redux'; // Import useSelector
 import Login from "./pages/Login";
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import apiClient from './utils/apiClient';
 import { setUserId } from './services/redux/globalSlice';
 import ProtectedRoute from './components/ProtectRoutes';
-import axios from 'axios';
+import { getUserID } from './services/authService';
 function App() {
+  const dispatch = useDispatch();
+ 
+  const verifyToken = async () => {
+    try {
+      const response = await apiClient.get("/verifyToken");
+      console.log(response.data);
+      if (response.data?.success) {
+        
+          dispatch(setUserId(getUserID()));
+        
+      
+      }
+    } catch (err) {
+      console.error("Token verification failed:", err);
+    }
+  }; 
 
-  const dispatch=useDispatch();
-  const verifyToken=async ()=>
-  {
-    try{
-      let responce=await axios.get("/verifyToken");
-      if(responce.success)
-      dispatch(setUserId(responce.userId));
-   }
-   catch(err){
-
-   }
-  }
-  useEffect( ()=>{
-      verifyToken();
-  },[])
-  return (
+  useEffect(() => {
    
+    
+      verifyToken();
+    
+  }, [verifyToken]); // Include userId in dependencies
+
+  return (
     <BrowserRouter>
       <Header />
-
       <Routes>
-        
-        <Route path="/" element={<GameHome/>} />
+        <Route path="/" element={<GameHome />} />
         <Route path="/Game" element={<Game />} />
-        <Route path="/Game/TicTacToe" element={<ProtectedRoute><TicTacToe  isOffline={true}/></ProtectedRoute>} />
-        <Route path="/Game/Chess" element={<Chess/>}/>
-        <Route path="/About" element={<About/>}/>
-        <Route path="/LeaderBoard" element={<LeaderBoard/>} />
-        <Route path="/Profile" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
-        <Route path="/Login" element={<Login/>}/>
+        <Route path="/Game/TicTacToe" element={<ProtectedRoute><TicTacToe isOffline={true} /></ProtectedRoute>} />
+        <Route path="/Game/Chess" element={<ProtectedRoute><Chess /></ProtectedRoute>} />
+        <Route path="/About" element={<About />} />
+        <Route path="/LeaderBoard" element={<LeaderBoard />} />
+        <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/Login" element={<Login />} />
       </Routes>
       <ToastContainer
         position="top-right"
@@ -64,7 +68,6 @@ function App() {
         theme="colored"
       />
     </BrowserRouter>
-   
   );
 }
 
