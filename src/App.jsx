@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import apiClient from './utils/apiClient';
 import { setUserId } from './services/redux/globalSlice';
 import ProtectedRoute from './components/ProtectRoutes';
-import Loader from './components/Loader'; // Import a Loader Component
+import Loader from './components/loader'; // Import a Loader Component
 
 function App() {
   const dispatch = useDispatch();
