@@ -4,6 +4,7 @@ import io from "socket.io-client";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GameEndPopup from "../components/GameEndPopup"
+import VideoCall from "../components/VideoCall";
 const initializeBoard = () => {
   return [
     ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
@@ -584,6 +585,7 @@ useEffect(()=>{
     setGameState('playing');
   }}
 />
+  <VideoCall/>
   {showOptionPawn[0] && <ShowOption setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} setBoard={setBoard} setTurn={setTurn} turn={turn} />}
 </div>)
 }

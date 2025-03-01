@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { motion } from "framer-motion";
 
-const socket = io("http://localhost:5000"); // Replace with your backend URL
+const socket = io(""); // Replace with your backend URL
 
 const VideoCall = () => {
     const localVideoRef = useRef(null);
