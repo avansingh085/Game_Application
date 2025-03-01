@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = { 
     userId: "",  // Load user ID from localStorage
-    isLogin: false,  // Set login state accordingly
+    isLogin: true,  // Set login state accordingly
     score: 0,
 };
 

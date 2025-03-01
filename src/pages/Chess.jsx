@@ -3,6 +3,8 @@ import ShowOption from '../components/showOptionChess';
 import io from "socket.io-client";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GameEndPopup from "../components/GameEndPopup"
+
 const initializeBoard = () => {
   return [
     ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
@@ -48,6 +50,10 @@ const ChessGame = () => {
   const [showOptionPawn,setShowOptionPawn]=useState([false,""]);
   const [userId,setUserId]=useState("");
   const [isMove,setisMove]=useState(0);
+  const [checkMate,setCheckMate]=useState(false);
+  const [isDraw,setDraw]=useState(false);
+  const [boardTheme, setBoardTheme] = useState('classic'); 
+  const [gameResult,setGameResult]=useState({type:"",winner:false,drawReason:""});
   useEffect(() => {
     if (selectedPiece) {
       getValidMove(selectedPiece.row, selectedPiece.col, false, chessBoard);
@@ -56,13 +62,7 @@ const ChessGame = () => {
     }
    
   }, [selectedPiece, chessBoard]);
-  const GameDraw=async ()=>
-  {
-          
-  }
-  const GameWin=async ()=>{
-
-  }
+  
  
   const checkIsKingIsSafe = async (fromRow, fromCol, toRow, toCol) => {
     let kingRow = -1, kingCol = -1;
@@ -90,7 +90,6 @@ const ChessGame = () => {
         }
     }
 
-   
     for (let i = 0; i < 8; i++) {
         for (let j = 0; j < 8; j++) {
             if (newBoard[i][j] !== "" && newBoard[i][j][1] !== turn) {
@@ -106,6 +105,7 @@ const ChessGame = () => {
 
     return true; 
 };
+
 const getValidMove = async (row, col, isOnlyMoveData, board) => {
     const Move = [];
     const piece = board[row][col];
@@ -259,30 +259,44 @@ const getValidMove = async (row, col, isOnlyMoveData, board) => {
         }
     }
 
+
     setValidMove(newMove);
-    return;
+    return newMove;
 };
 
-const winnerConditionCheck=async()=>{
-
-}
 useEffect(() => {
   if (!online || !userId) return;
 
-  const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: userId, gameType: "TIC" } });
+  const newSocket = io("http://localhost:3001", { query: { id: userId, gameType: "chess" } });
   setSocket(newSocket);
 
   newSocket.emit("join", { board: initializeBoard() });
 
   newSocket.on("waiting", (message) => toast.info(message));
   newSocket.on("startGame", ({ gameId, players }) => {
+    console.log(gameId,players)
     const assignedSymbol = players.X.socketId === newSocket.id ? "b" : "w";
+   
     setOnlineTurn(assignedSymbol)
     setGameId(gameId);
     toast.success(`Game started! You are ${assignedSymbol}`);
   });
-
+  newSocket.on("checkMate",({gameId,turn})=>{
+   
+      if(onlineTurn===turn)
+      {
+            setGameResult({type:"checkmate",winner:true}); 
+      }
+      else
+      {
+         setGameResult({type:"checkmate",winner:false}); 
+      }
+  })
+  newSocket.on("Draw",({data})=>{
+    setGameResult({type:"draw game",winner:false,drawReason:"game draw"}); 
+  })
   newSocket.on("move", ({ board: newBoard, symbol }) => {
+   
     setBoard(newBoard);
     setTurn(symbol)
   
@@ -305,7 +319,7 @@ useEffect(() => {
   };
 }, [online, userId]);
 
-console.log(turn,"  ",onlineTurn)
+
 const handleSelect = async (row, col) => {
   if(online && onlineTurn !== turn) return;
 
@@ -344,6 +358,72 @@ const handleSelect = async (row, col) => {
   }
 
 };
+const checkIsKingCheakedOrDrawOrSafe=async (newBoard)=>{
+  let kingRow=-1;
+  let kingCol=-1;
+  for (let i = 0; i < 8; i++) {
+    for (let j = 0; j < 8; j++) {
+        if (newBoard[i][j] !== "" && newBoard[i][j][1] === turn &&
+            (newBoard[i][j][0] === "k" || newBoard[i][j][0] === "K")) {
+            kingRow = i;
+            kingCol = j;
+        }
+    }
+}
+let isAnyMove=false,checked=false;
+  for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+       // console.log(newBoard[i][j])
+         
+          if (newBoard[i][j] !== "" && newBoard[i][j][1]=== turn){
+            let validMoves = await getValidMove(i, j, false, newBoard);
+          
+            if(validMoves.length!==0)
+            {
+              isAnyMove=true;
+            }
+          }
+      }
+  }
+  let res=await checkIsKingIsSafe(0,0,0,0);
+  if(!res)
+  checked=true;
+  if(!isAnyMove&&checked)
+  {
+    setCheckMate(true);
+    return;
+  }
+
+    if(!isAnyMove)
+    {
+        setDraw(true);
+    }
+
+}
+useEffect(()=>{
+  checkIsKingCheakedOrDrawOrSafe(chessBoard);
+  
+ },[chessBoard])
+ useEffect(()=>{
+  if(checkMate)
+  {
+    toast.success("checkmate by opponent you loss");
+    if(online&&socket)
+    {
+      socket.emit("checkMate",{gameId,turn});
+    }
+  }
+
+    if(isDraw&&!checkMate)
+    {
+      toast.success("game draw no win");
+       if(online&&socket)
+        {
+          socket.emit("Draw",{gameId,turn});
+        }
+    }
+  
+ },[checkMate,isDraw])
 useEffect(()=>{
  if(!socket)
   return;
@@ -351,80 +431,146 @@ useEffect(()=>{
 },[isMove])
 
   return (
-    <div className="flex flex-col items-center bg-gray-800 min-h-screen text-white p-4">
-   
-    <h1 className="text-3xl font-bold mb-4">Chess Game</h1>
-    <div className="flex justify-center space-x-4 mb-6">
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={(e)=>{e.stopPropagation(); setOnline(!online)}}>
-       {!online ? "Play Online" : "play Offline"}
-      </button>
-     
-      { online ? <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-       rejoin
-      </button> : null
-    }
-
-    </div>
+    <div className="flex flex-col items-center bg-gray-800 min-h-screen text-white p-4 space-y-4">
   
-      <input  className="mb-5 text-purple-400"  onChange={(e)=>setUserId(e.target.value)}/>
-    <div className="grid grid-cols-8 w-full min-w-[300px] max-w-[600px] min-h-[300px] max-h-[600px] mx-auto gap-1">
-  {chessBoard.map((row, rowIndex) =>
-    row.map((cell, colIndex) => {
-      const isWhiteSquare = (rowIndex + colIndex) % 2 === 0;
-      const bgColor = isWhiteSquare ? "bg-pink-200" : "bg-purple-600";
-      const pieceSymbol = cell ? getChessSymbol(cell[0]) : "";
-      const isValidMove = validMove.some(
-        ([validRow, validCol]) => validRow === rowIndex && validCol === colIndex
-      );
-      const highlight = isValidMove ? "bg-yellow-400" : "";
-
-      const isPlayerPiece = cell && cell[1] === turn;  
-      const isOpponentPiece = cell && cell[1] !== turn; 
-
-      const pieceColor = cell[1]==="w" ? "text-white" :  "text-black" ;
-
-      const pieceSize = 'text-4xl sm:text-5xl md:text-6xl';
-
-      return (
-        <div
-          key={`${rowIndex}-${colIndex}`}
-          className={`w-full aspect-square flex items-center justify-center shadow-md border-2 border-gray-900 transition-all duration-300 ease-in-out transform 
-            ${isWhiteSquare ? "bg-gradient-to-br from-yellow-500 to-yellow-700" : "bg-gradient-to-br from-yellow-700 to-yellow-800"} 
-            ${isValidMove ? "hover:scale-110 hover:shadow-xl hover:from-green-400 hover:to-green-600" : ""}`}
-          onClick={async () => await handleSelect(rowIndex, colIndex)}
-          style={{
-            boxShadow: isValidMove ? "0 0 12px 4px rgba(34, 197, 94, 0.8)" : "",
-            cursor: "pointer",
-          }}
+  <header className="text-center space-y-4">
+    <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+      Chess Master
+    </h1>
+  
+    <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
+      <div className="flex gap-2 flex-wrap justify-center">
+        <button 
+          className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-all transform hover:scale-105"
+          onClick={(e) => { e.stopPropagation(); setOnline(!online) }}
         >
-          <span
-            className={`${pieceColor} font-bold ${pieceSize}`}
-            style={{
-              textShadow: "0 0 6px rgba(0, 0, 0, 0.5), 0 0 8px rgba(255, 255, 255, 0.8)",
-              fontFamily: "ChessFont, sans-serif", 
-            }}
-          >
-            {pieceSymbol}
-          </span>
+          {!online ? "🌐 Play Online" : "📴 Play Offline"}
+        </button>
+        
+        {online && (
+          <button className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg transition-all transform hover:scale-105">
+            🔄 Rejoin Game
+          </button>
+        )}
+      </div>
+      
+      <input
+        placeholder="Enter User ID"
+        className="bg-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder-gray-400"
+        onChange={(e) => setUserId(e.target.value)}
+      />
+    </div>
+  </header>
+
+ 
+  <div className="flex flex-col md:flex-row gap-4 items-center">
+    
+    <div className={`p-3 rounded-lg ${turn === 'w' ? 'bg-amber-100 text-black' : 'bg-gray-900 text-white'} 
+      transition-all duration-300 transform hover:scale-105`}>
+      <div className="flex items-center gap-2 font-bold text-lg">
+        <span className="text-2xl">{turn === 'w' ? '♔' : '♚'}</span>
+        {turn === 'w' ? "White's Turn" : "Black's Turn"}
+      </div>
+      {online && (
+        <div className="text-sm mt-1 text-center">
+          (You're playing as {onlineTurn === 'w' ? '⚪ White' : '⚫ Black'})
         </div>
-      );
-    })
-  )}
-</div>
+      )}
+    </div>
 
-    <div className="mt-6 flex justify-center">
-  <button
-    className="bg-gradient-to-r from-purple-500 to-purple-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:from-purple-600 hover:to-purple-800 hover:scale-105 transition-transform transform duration-300 ease-in-out"
-    onClick={async () =>{ await setBoard(initializeBoard()); if(online&&socket)socket?.emit('reset',{gameId,board:initializeBoard()})}}
-  >
-    🔄 Restart Game
-  </button>
-</div>
-
-     {showOptionPawn[0] ? <ShowOption  setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} turn={turn=='w' ? 'b': 'w' } setBoard={setBoard} setTurn={setTurn}/> : null}
+    <div className="bg-gray-700 p-3 rounded-lg space-y-2">
+      <h3 className="font-semibold text-center">Board Theme</h3>
+      <div className="flex gap-2">
+        {['classic', 'green', 'blue', 'pink'].map((theme) => (
+          <button
+            key={theme}
+            onClick={() => setBoardTheme(theme)}
+            className={`w-8 h-8 rounded-full border-2 ${
+              boardTheme === theme ? 'border-yellow-400 scale-110' : 'border-transparent'
+            } transition-all ${theme === 'classic' ? 'bg-amber-200' : ''} ${
+              theme === 'green' ? 'bg-emerald-400' : ''
+            } ${theme === 'blue' ? 'bg-sky-400' : ''} ${theme === 'pink' ? 'bg-pink-400' : ''}`}
+            title={`${theme.charAt(0).toUpperCase() + theme.slice(1)} Theme`}
+          />
+        ))}
+      </div>
+    </div>
   </div>
+
   
-  );
-};
+  <div className="w-full max-w-[90vw] sm:max-w-[80vw] md:max-w-[600px] aspect-square">
+    <div className="grid grid-cols-8 gap-1 w-full h-full shadow-xl rounded-lg overflow-hidden border-4 border-gray-700">
+      {chessBoard.map((row, rowIndex) =>
+        row.map((cell, colIndex) => {
+          const isWhiteSquare = (rowIndex + colIndex) % 2 === 0;
+          const isValidMove = validMove.some(
+            ([validRow, validCol]) => validRow === rowIndex && validCol === colIndex
+          );
+          const pieceSymbol = cell ? getChessSymbol(cell[0]) : "";
+          const pieceColor = cell?.charAt(1) === "w" ? "text-white" : "text-black";
+
+          let squareColor = '';
+          switch(boardTheme) {
+            case 'green':
+              squareColor = isWhiteSquare ? 'bg-emerald-200' : 'bg-emerald-800';
+              break;
+            case 'blue':
+              squareColor = isWhiteSquare ? 'bg-sky-200' : 'bg-sky-800';
+              break;
+            case 'pink':
+              squareColor = isWhiteSquare ? 'bg-pink-200' : 'bg-pink-800';
+              break;
+            default:
+              squareColor = isWhiteSquare ? 'bg-amber-200' : 'bg-amber-800';
+          }
+
+          return (
+            <div
+              key={`${rowIndex}-${colIndex}`}
+              className={`relative aspect-square flex items-center justify-center
+                ${squareColor}
+                ${isValidMove ? 'cursor-pointer bg-yellow-400/80' : 'cursor-pointer'}
+                transition-all duration-200 hover:scale-105`}
+              onClick={async () => await handleSelect(rowIndex, colIndex)}
+            >
+              <span className={`${pieceColor} text-3xl md:text-4xl lg:text-5xl font-bold drop-shadow-2xl`}>
+                {pieceSymbol}
+              </span>
+              {isValidMove && (
+                <div className="absolute inset-0 border-4 border-yellow-400 animate-pulse rounded-lg" />
+              )}
+            </div>
+          );
+        })
+      )}
+    </div>
+  </div>
+
+  <button
+    className="bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105 flex items-center gap-2"
+    onClick={async () => {
+      await setBoard(initializeBoard());
+      if (online && socket) socket?.emit('reset', { gameId, board: initializeBoard() });
+    }}
+  >
+    <svg className="w-5 h-5 animate-spin-once" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+    Restart Game
+  </button>
+  <GameEndPopup
+  socket={socket}
+  gameId={gameId}
+  userId={userId}
+  gameResult={gameResult}
+  onRematch={() => {
+    setBoard(initializeBoard());
+    setTurn('w');
+    setGameState('playing');
+  }}
+/>
+  {showOptionPawn[0] && <ShowOption setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} setBoard={setBoard} setTurn={setTurn} turn={turn} />}
+</div>)
+}
 
 export default ChessGame;
