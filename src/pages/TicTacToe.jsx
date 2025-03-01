@@ -121,7 +121,7 @@ const TicTacToe = ({ isOffline }) => {
   useEffect(() => {
     if (!isOnline || !userName) return;
 
-    const newSocket = io("http://localhost:3001", { query: { id: userName, gameType: "TIC" } });
+    const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: userName, gameType: "TIC" } });
     setSocket(newSocket);
 
     newSocket.emit("join", { board });
