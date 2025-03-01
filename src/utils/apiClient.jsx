@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:3001',
+  baseURL: import.meta.env.BACKEND_URL,
 });
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');

@@ -1,46 +1,48 @@
-import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Header from './components/header'; 
 import Game from './pages/Game';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import TicTacToe from './pages/TicTacToe';
-import GameHome from './pages/Home'
+import GameHome from './pages/Home';
 import LeaderBoard from './pages/LeaderBoard';
 import Profile from './pages/Profile';
 import Chess from './pages/Chess';
 import About from './pages/About';
-import { setToken, getToken } from './services/authService';
-import { useDispatch, useSelector } from 'react-redux'; // Import useSelector
+import { setToken, getToken, getUserID } from './services/authService';
+import { useDispatch } from 'react-redux';
 import Login from "./pages/Login";
-import { useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import apiClient from './utils/apiClient';
 import { setUserId } from './services/redux/globalSlice';
 import ProtectedRoute from './components/ProtectRoutes';
-import { getUserID } from './services/authService';
+import Loader from './components/Loader'; // Import a Loader Component
+
 function App() {
   const dispatch = useDispatch();
- 
+  const [loading, setLoading] = useState(true); // Track loading state
+
   const verifyToken = async () => {
     try {
       const response = await apiClient.get("/verifyToken");
-      console.log(response.data);
+      console.log(response)
       if (response.data?.success) {
-        
-          dispatch(setUserId(getUserID()));
-        
-      
+        dispatch(setUserId(getUserID()));
       }
     } catch (err) {
-      console.error("Token verification failed:", err);
+      console.log("Token verification failed:", err);
+    } finally {
+      setLoading(false); // Stop loading once verification is complete
     }
-  }; 
+  };
 
   useEffect(() => {
-   
-    
-      verifyToken();
-    
-  }, [verifyToken]); // Include userId in dependencies
+    verifyToken();
+  }, []);
+
+  if (loading) {
+    return <Loader />; // Show loader until the authentication check is done
+  }
 
   return (
     <BrowserRouter>

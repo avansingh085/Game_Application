@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import ShowOption from '../components/showOptionChess';
 import io from "socket.io-client";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GameEndPopup from "../components/GameEndPopup"
-
 const initializeBoard = () => {
   return [
     ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
@@ -44,6 +43,7 @@ const ChessGame = () => {
   const [online,setOnline]=useState(false);
   const [onlineTurn,setOnlineTurn]=useState('');
   const [reJoin,setReJoin]=useState(false);
+  const audioRef = useRef(null);
   const [gameId,setGameId]=useState(null);
   const [turn, setTurn] = useState("b");
   const [validMove, setValidMove] = useState([]);
@@ -259,7 +259,7 @@ const getValidMove = async (row, col, isOnlyMoveData, board) => {
         }
     }
 
-
+    if(selectedPiece)
     setValidMove(newMove);
     return newMove;
 };
@@ -267,7 +267,7 @@ const getValidMove = async (row, col, isOnlyMoveData, board) => {
 useEffect(() => {
   if (!online || !userId) return;
 
-  const newSocket = io("http://localhost:3001", { query: { id: userId, gameType: "chess" } });
+  const newSocket = io(process.env.BACKEND_URL, { query: { id: userId, gameType: "chess" } });
   setSocket(newSocket);
 
   newSocket.emit("join", { board: initializeBoard() });
@@ -281,9 +281,9 @@ useEffect(() => {
     setGameId(gameId);
     toast.success(`Game started! You are ${assignedSymbol}`);
   });
-  newSocket.on("checkMate",({gameId,turn})=>{
+  newSocket.on("checkMate",({gameId,turn,winner})=>{
    
-      if(onlineTurn===turn)
+      if(winner===userId)
       {
             setGameResult({type:"checkmate",winner:true}); 
       }
@@ -400,17 +400,28 @@ let isAnyMove=false,checked=false;
     }
 
 }
+
+const playMoveSound = () => {
+  if (audioRef.current) {
+    audioRef.current.currentTime = 0;
+    audioRef.current.play().catch((error) => console.error("Audio play error:", error));
+  }
+};
+
+
 useEffect(()=>{
   checkIsKingCheakedOrDrawOrSafe(chessBoard);
-  
+  playMoveSound();
  },[chessBoard])
+
+
  useEffect(()=>{
   if(checkMate)
   {
     toast.success("checkmate by opponent you loss");
     if(online&&socket)
     {
-      socket.emit("checkMate",{gameId,turn});
+      socket.emit("checkMate",{gameId,turn,winner:userId});
     }
   }
 
@@ -424,15 +435,19 @@ useEffect(()=>{
     }
   
  },[checkMate,isDraw])
+
+
+
 useEffect(()=>{
  if(!socket)
   return;
   socket.emit("move", { symbol:turn,board:chessBoard, gameId });
 },[isMove])
 
+
   return (
     <div className="flex flex-col items-center bg-gray-800 min-h-screen text-white p-4 space-y-4">
-  
+      <audio ref={audioRef} src="/chess.mp3" preload="auto" />
   <header className="text-center space-y-4">
     <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
       Chess Master
@@ -477,7 +492,7 @@ useEffect(()=>{
         </div>
       )}
     </div>
-
+   
     <div className="bg-gray-700 p-3 rounded-lg space-y-2">
       <h3 className="font-semibold text-center">Board Theme</h3>
       <div className="flex gap-2">

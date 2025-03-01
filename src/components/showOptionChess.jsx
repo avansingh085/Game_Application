@@ -6,16 +6,16 @@ function ShowOptionPawns({ setShowOptionPawn, showOptionPawn, turn, setBoard, se
       let col = showOptionPawn[3];
   
       const pieceMapping = {
-        rook: turn === 'b' ? "rb" : "Rw",
-        bishop: turn === 'b' ? "bb" : "Bw",
-        knight: turn === 'b' ? "nb" : "Nw",
-        queen: turn === 'b' ? "qb" : "Qw"
+        rook: turn !== 'b' ? "rb" : "Rw",
+        bishop: turn !== 'b' ? "bb" : "Bw",
+        knight: turn !== 'b' ? "nb" : "Nw",
+        queen: turn !== 'b' ? "qb" : "Qw"
       };
   
       newBoard[row][col] = pieceMapping[piece];
   
       const nextTurn = turn === "w" ? "b" : "w";
-      setTurn(nextTurn);
+     
   
       setBoard(newBoard);
       setShowOptionPawn([false, "", 0, 0]);
