@@ -572,7 +572,7 @@ useEffect(()=>{
     </svg>
     Restart Game
   </button>
-  <GameEndPopup
+ { (checkMate||isDraw) ? <GameEndPopup
   socket={socket}
   gameId={gameId}
   userId={userId}
@@ -584,7 +584,8 @@ useEffect(()=>{
     setDraw(false)
     setGameState('playing');
   }}
-/>
+/>:null
+}
   {online&&gameId&&socket ? <VideoCall  roomId={gameId}/>: null}
   {showOptionPawn[0] && <ShowOption setShowOptionPawn={setShowOptionPawn} showOptionPawn={showOptionPawn} setBoard={setBoard} setTurn={setTurn} turn={turn} />}
 </div>)
