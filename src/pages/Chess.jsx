@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import GameEndPopup from "../components/GameEndPopup"
 import VideoCall from "../components/VideoCall";
 import {useSelector} from 'react-redux';
+import { getUserID } from "../services/authService";
 const initializeBoard = () => {
   return [
     ["rb", "nb", "bb", "qb", "kb", "bb", "nb", "rb"], 
@@ -50,7 +51,7 @@ const ChessGame = () => {
   const [turn, setTurn] = useState("b");
   const [validMove, setValidMove] = useState([]);
   const [showOptionPawn,setShowOptionPawn]=useState([false,""]);
-  let userId=useSelector(state=>state.auth.userId);
+  const [userId,setUserId]=useState(Math.random().toString(36).substring(7));
   const [isMove,setisMove]=useState(0);
   const [checkMate,setCheckMate]=useState(false);
   const [isDraw,setDraw]=useState(false);
@@ -265,7 +266,7 @@ const getValidMove = async (row, col, isOnlyMoveData, board) => {
     setValidMove(newMove);
     return newMove;
 };
-
+console.log(userId,"AK_$&")
 useEffect(() => {
   if (!online || !userId) return;
 
