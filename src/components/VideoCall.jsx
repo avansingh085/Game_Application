@@ -1,97 +1,150 @@
-import React, { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import io from "socket.io-client";
 
-const socket = io(""); // Replace with your backend URL
+const VideoCall = ({ roomId }) => {
+  const [muted, setMuted] = useState(false);
+  const [videoOn, setVideoOn] = useState(true);
 
-const VideoCall = () => {
-    const localVideoRef = useRef(null);
-    const remoteVideoRef = useRef(null);
-    const [isLarge, setIsLarge] = useState(false);
-    const roomId = "testRoom";
-    
-    useEffect(() => {
-        let pc = new RTCPeerConnection({
-            iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const pcRef = useRef(null);
+  const socketRef = useRef(null);
+  const localStreamRef = useRef(null);
+
+  useEffect(() => {
+    const initializeConnection = async () => {
+      try {
+        socketRef.current = io("https://videocallbackend-pqmh.onrender.com");
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        localStreamRef.current = stream;
+        localVideoRef.current.srcObject = stream;
+
+        pcRef.current = new RTCPeerConnection({
+          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
         });
 
-        navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(stream => {
-            localVideoRef.current.srcObject = stream;
-            stream.getTracks().forEach(track => pc.addTrack(track, stream));
+        stream.getTracks().forEach((track) => {
+          pcRef.current.addTrack(track, stream);
         });
 
-        socket.emit("join-room", roomId, socket.id);
-
-        socket.on("user-connected", async (userId) => {
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
-            socket.emit("offer", { to: userId, offer });
-        });
-
-        socket.on("offer", async ({ from, offer }) => {
-            await pc.setRemoteDescription(offer);
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
-            socket.emit("answer", { to: from, answer });
-        });
-
-        socket.on("answer", async ({ answer }) => {
-            await pc.setRemoteDescription(answer);
-        });
-
-        socket.on("ice-candidate", async ({ candidate }) => {
-            await pc.addIceCandidate(candidate);
-        });
-
-        pc.onicecandidate = (event) => {
-            if (event.candidate) {
-                socket.emit("ice-candidate", { to: roomId, candidate: event.candidate });
-            }
+        pcRef.current.ontrack = (event) => {
+          remoteVideoRef.current.srcObject = event.streams[0];
         };
 
-        pc.ontrack = (event) => {
-            remoteVideoRef.current.srcObject = event.streams[0];
+        pcRef.current.onicecandidate = (event) => {
+          if (event.candidate) {
+            socketRef.current.emit("candidate", {
+              candidate: event.candidate,
+              roomId,
+            });
+          }
         };
 
-        return () => {
-            socket.off("user-connected");
-            socket.off("offer");
-            socket.off("answer");
-            socket.off("ice-candidate");
-        };
-    }, []);
+        socketRef.current.emit("join", roomId);
 
-    return (
-        <div className="z-50 flex flex-col items-center bg-transparent text-white">
-            <motion.div
-                className="relative cursor-pointer"
-                drag
-                dragConstraints={{ top: -300, left: -300, right: 300, bottom: 300 }}
-                onDoubleClick={() => setIsLarge(!isLarge)}
-                style={{ width: isLarge ? "80%" : "30%" }}
-            >
-                <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    className="border-2 border-blue-500 rounded-lg w-full"
-                />
-            </motion.div>
-            <motion.div
-                className="absolute bottom-5 right-5 cursor-pointer"
-                drag
-                onDoubleClick={() => setIsLarge(!isLarge)}
-                style={{ width: isLarge ? "80%" : "30%" }}
-            >
-                <video
-                    ref={remoteVideoRef}
-                    autoPlay
-                    playsInline
-                    className="border-2 border-green-500 rounded-lg w-full"
-                />
-            </motion.div>
-        </div>
-    );
+        socketRef.current.on("offer", async (offer) => {
+          await pcRef.current.setRemoteDescription(offer);
+          const answer = await pcRef.current.createAnswer();
+          await pcRef.current.setLocalDescription(answer);
+          socketRef.current.emit("answer", { answer, roomId });
+        });
+
+        socketRef.current.on("answer", async (answer) => {
+          await pcRef.current.setRemoteDescription(answer);
+        });
+
+        socketRef.current.on("candidate", async (candidate) => {
+          try {
+            await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+          } catch (e) {
+            console.error("Error adding ICE candidate:", e);
+          }
+        });
+
+        socketRef.current.on("offerNeeded", async () => {
+          const offer = await pcRef.current.createOffer();
+          await pcRef.current.setLocalDescription(offer);
+          socketRef.current.emit("offer", { offer, roomId });
+        });
+      } catch (error) {
+        console.error("Error initializing connection:", error);
+      }
+    };
+
+    initializeConnection();
+
+    return () => {
+      if (pcRef.current) pcRef.current.close();
+      if (socketRef.current) socketRef.current.disconnect();
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [roomId]);
+
+  const toggleMute = () => {
+    const audioTracks = localVideoRef.current.srcObject.getAudioTracks();
+    audioTracks.forEach((track) => (track.enabled = !track.enabled));
+    setMuted(!muted);
+  };
+
+  const toggleVideo = () => {
+    const videoTracks = localVideoRef.current.srcObject.getVideoTracks();
+    videoTracks.forEach((track) => (track.enabled = !track.enabled));
+    setVideoOn(!videoOn);
+  };
+
+  return (
+    <div className="fixed inset-0 pointer-events-none">
+      {/* Local Video */}
+      <motion.video
+        ref={localVideoRef}
+        autoPlay
+        muted
+        className="absolute bg-black rounded-lg shadow-lg pointer-events-auto"
+        drag
+        dragConstraints={{ top: -300, left: -300, right: 300, bottom: 300 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        style={{ width: "150px", height: "100px" }}
+      />
+
+      {/* Remote Video */}
+      <motion.video
+        ref={remoteVideoRef}
+        autoPlay
+        className="absolute bg-black rounded-lg shadow-lg pointer-events-auto"
+        drag
+        dragConstraints={{ top: -300, left: -300, right: 300, bottom: 300 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        style={{ width: "150px", height: "100px" }}
+      />
+
+      {/* Controls (Top-Right Corner) */}
+      <div className="fixed top-4 right-4 flex space-x-2 bg-black/50 p-2 rounded-lg pointer-events-auto">
+        <button
+          onClick={toggleMute}
+          className={`px-4 py-2 rounded-lg ${muted ? "bg-red-500" : "bg-green-500"} text-white`}
+        >
+          {muted ? "Unmute" : "Mute"}
+        </button>
+        <button
+          onClick={toggleVideo}
+          className={`px-4 py-2 rounded-lg ${videoOn ? "bg-green-500" : "bg-red-500"} text-white`}
+        >
+          {videoOn ? "Stop Video" : "Start Video"}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default VideoCall;
