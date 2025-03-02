@@ -580,6 +580,8 @@ useEffect(()=>{
   onRematch={() => {
     setBoard(initializeBoard());
     setTurn('w');
+    setCheckMate(false);
+    setDraw(false)
     setGameState('playing');
   }}
 />
