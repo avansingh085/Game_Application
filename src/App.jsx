@@ -17,7 +17,7 @@ import apiClient from './utils/apiClient';
 import { setUserId } from './services/redux/globalSlice';
 import ProtectedRoute from './components/ProtectRoutes';
 import Loader from './components/loader'; // Import a Loader Component
-
+import Footer from './components/Footer';
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true); // Track loading state
@@ -69,6 +69,7 @@ function App() {
         pauseOnHover
         theme="colored"
       />
+      <Footer />
     </BrowserRouter>
   );
 }

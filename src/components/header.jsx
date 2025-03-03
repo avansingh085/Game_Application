@@ -6,7 +6,7 @@ const Header = () => {
    const isLogin=useSelector((state)=>state.auth.isLogin);
    
   return (
-    <header className="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 m-0 p-0 text-white shadow-lg">
+    <header className="bg-black m-0 p-0 text-white shadow-lg">
       <div className="container mx-auto p-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <img src="/path-to-logo.png" alt="Game App Logo" className="h-12 w-12 rounded-full border-2 border-white" />

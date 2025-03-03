@@ -426,6 +426,9 @@ useEffect(()=>{
     {
       socket.emit("checkMate",{gameId,turn,winner:userId});
     }
+    else
+    {
+    }
   }
 
     if(isDraw&&!checkMate)

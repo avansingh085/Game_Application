@@ -7,7 +7,7 @@ import { setToken,setUserID } from '../services/authService';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [username, setUserName] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,12 +33,12 @@ const AuthForm = () => {
       let response = await apiClient.post(isLogin ? "/login" : "/register", {
         email,
         password,
-        ...(isLogin ? {} : { username }), 
+        ...(isLogin ? {} : { name }), 
       });
     console.log(response.data)
       if (response.data.success) {
         setToken(response.data.token);
-        setUserID(response.data?.userID)
+       
         dispatch(setUserId(response.data?.userId));
         navigate("/Game"); 
       } else {
@@ -89,14 +89,14 @@ const AuthForm = () => {
             {!isLogin && (
               <>
                 <div>
-                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">Name</label>
                   <input
-                    id="username"
+                    id="name"
                     type="text"
                     required
                     className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                    value={username}
-                    onChange={(e) => setUserName(e.target.value)}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                   />
                 </div>
 

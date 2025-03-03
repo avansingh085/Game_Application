@@ -2,11 +2,11 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = { 
-    userId: "",  // Load user ID from localStorage
-    isLogin: true,  // Set login state accordingly
+    userId: "", 
+    isLogin: true,  
     score: 0,
+    user: null,
 };
-
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -23,8 +23,11 @@ const authSlice = createSlice({
     setScore: (state, action) => {
       state.score = action.payload;
     },
+    setUser:(state,action)=>{
+      state.user=action.payload;
+    }
   },
 });
 
-export const { setScore, logout, setUserId } = authSlice.actions;
+export const { setScore, logout, setUserId,setUser } = authSlice.actions;
 export default authSlice.reducer;
