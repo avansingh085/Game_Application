@@ -1,19 +1,23 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
+import apiClient from '../utils/apiClient';
 const Leaderboard = () => {
-  // Leaderboard data
+ 
   const [leaderboardData, setLeaderboardData] = useState([])
-  useEffect(()=>{
-    const fetchData = async () => {
-      try {
-        const response = await apiClient.get("/getLeaderboard");
-        if (response.data?.success) {
-          setLeaderboardData(response.data.leaderboard);
-        }
-      } catch (err) {
-        console.error("Leaderboard fetch error:", err);
+  console.log(leaderboardData)
+  const fetchData = async () => {
+    try {
+      const response = await apiClient.get("/getLeaderboard");
+     // console.log(response.data,"AVANISH")
+      if (response.data?.success) {
+        setLeaderboardData(response.data.leaderboard);
       }
-    };
+    } catch (err) {
+      console.log("Leaderboard fetch error:", err);
+    }
+  };
+  useEffect(()=>{
+    
     fetchData();
   },[])
 
