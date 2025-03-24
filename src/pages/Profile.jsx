@@ -10,6 +10,7 @@ const ProfilePage = () => {
     name: "JohnDoe123",
     score: 2450,
     imageUrl: "https://via.placeholder.com/150",
+    _id:0
   };
 
 
@@ -18,12 +19,11 @@ const ProfilePage = () => {
   const [image, setImage] = useState(user?.imageUrl);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
   const updateProfile = async () => {
     setLoading(true);
     setMessage("");
     try {
-      const res = await apiClient.post("/updateProfile", { name, score, image });
+      const res = await apiClient.post("/updateProfile", { name, score, image,_id:user._id });
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         setMessage("Profile updated successfully!");
