@@ -9,7 +9,7 @@ import LeaderBoard from './pages/LeaderBoard';
 import Profile from './pages/Profile';
 import Chess from './pages/Chess';
 import About from './pages/About';
-import { setToken, getToken, getUserID } from './services/authService';
+import {  getToken, getUserID } from './services/authService';
 import { useDispatch } from 'react-redux';
 import Login from "./pages/Login";
 import { useEffect, useState } from 'react';
