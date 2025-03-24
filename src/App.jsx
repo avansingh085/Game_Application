@@ -21,10 +21,10 @@ import Footer from './components/Footer';
 function App() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true); 
-  const [token, setToken] = useState(localStorage.getItem("authToken"));
+  
   const verifyToken = async () => {
     try {
-      const response = await apiClient.get("/verifyToken?token=" + token);
+      const response = await apiClient.get("/verifyToken");
      
       if (response.data?.success) {
         console.log(response.data);
@@ -36,22 +36,10 @@ function App() {
       setLoading(false); 
     }
   };
- useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-
-      setToken(token);
-    }
-  },[])
+ 
   useEffect(() => {
-    if(token)
     verifyToken();
-  setTimeout(() => {
-    setLoading(false);
-  }
-  , 2000);
-  
-  }, [token]);
+  }, []);
 
   if (loading) {
     return <Loader />; // Show loader until the authentication check is done
