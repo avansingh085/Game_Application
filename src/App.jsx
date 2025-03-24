@@ -44,6 +44,7 @@ function App() {
     }
   },[])
   useEffect(() => {
+    if(token)
     verifyToken();
   }, [token]);
 
