@@ -1,20 +1,23 @@
 import React from 'react';
-
+import { useEffect, useState } from 'react';
 const Leaderboard = () => {
   // Leaderboard data
-  const leaderboardData = [
-    { rank: 1, name: 'John Doe', score: 1500 },
-    { rank: 2, name: 'Jane Smith', score: 1450 },
-    { rank: 3, name: 'Sam Wilson', score: 1400 },
-    { rank: 4, name: 'Charlie Brown', score: 1300 },
-    { rank: 5, name: 'Alice Cooper', score: 1200 },
-    { rank: 6, name: 'Bob Marley', score: 1100 },
-    { rank: 7, name: 'Zoe Stark', score: 1000 },
-    { rank: 8, name: 'Steve Rogers', score: 950 },
-    { rank: 9, name: 'Tony Stark', score: 900 },
-    { rank: 10, name: 'Bruce Banner', score: 850 },
-  ];
+  const [leaderboardData, setLeaderboardData] = useState([])
+  useEffect(()=>{
+    const fetchData = async () => {
+      try {
+        const response = await apiClient.get("/getLeaderboard");
+        if (response.data?.success) {
+          setLeaderboardData(response.data.leaderboard);
+        }
+      } catch (err) {
+        console.error("Leaderboard fetch error:", err);
+      }
+    };
+    fetchData();
+  },[])
 
+   
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-4xl bg-gray-900 p-8 rounded-xl shadow-2xl border border-gray-800">
@@ -32,15 +35,22 @@ const Leaderboard = () => {
               </tr>
             </thead>
             <tbody>
-              {leaderboardData.map((player) => (
+              {leaderboardData.map((
+               player,
+                index
+
+              ) => (
                 <tr 
-                  key={player.rank} 
+                  key={
+                    player._id
+                  } 
                   className="border-b border-gray-800 hover:bg-gray-800 transition-colors"
                 >
-                  <td className="py-4 px-6 font-mono text-purple-300">#{player.rank}</td>
+                  <td className="py-4 px-6 font-mono text-purple-300">#{
+                    index + 1}</td>
                   <td className="py-4 px-6 font-medium">{player.name}</td>
                   <td className="py-4 px-6 text-right font-bold text-pink-400">
-                    {player.score.toLocaleString()}
+                    {player.score}
                   </td>
                 </tr>
               ))}
