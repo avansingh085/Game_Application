@@ -7,13 +7,13 @@ import apiClient from "../utils/apiClient";
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth?.User) || {
-    userame: "JohnDoe123",
+    name: "JohnDoe123",
     score: 2450,
     imageUrl: "https://via.placeholder.com/150",
   };
 
 
-  const [name, setName] = useState(user?.username);
+  const [name, setName] = useState(user?.name);
   const [score, setScore] = useState(user?.score);
   const [image, setImage] = useState(user?.imageUrl);
   const [loading, setLoading] = useState(false);
@@ -54,14 +54,14 @@ const ProfilePage = () => {
 
       
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-black mb-2">{user.username}</h1>
+          <h1 className="text-2xl font-bold text-black mb-2">{user.name}</h1>
           <p className="text-gray-600">Score: <span className="font-semibold">{user.score||0}</span></p>
         </div>
 
         <div className="space-y-3">
           <input 
             type="text" 
-            value={name} 
+            value={user.name} 
             onChange={(e) => setName(e.target.value)} 
             placeholder="Enter new name"
             className="w-full p-2 border rounded"
