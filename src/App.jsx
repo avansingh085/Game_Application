@@ -46,6 +46,11 @@ function App() {
   useEffect(() => {
     if(token)
     verifyToken();
+  setTimeout(() => {
+    setLoading(false);
+  }
+  , 2000);
+  
   }, [token]);
 
   if (loading) {
