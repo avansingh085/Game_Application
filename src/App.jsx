@@ -25,7 +25,7 @@ function App() {
   const verifyToken = async () => {
     try {
       const response = await apiClient.get("/verifyToken");
-    
+      console.log(response,"AVAN SIngh");
       if (response.data?.success) {
         console.log(response.data);
         dispatch(setUser(response.data.Profile));
