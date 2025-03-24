@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setUserId } from '../services/redux/globalSlice';
+import { setUser } from '../services/redux/globalSlice';
 import apiClient from '../utils/apiClient';
 import { setToken,setUserID } from '../services/authService';
 
@@ -39,7 +39,7 @@ const AuthForm = () => {
       if (response.data.success) {
         setToken(response.data.token);
        
-        dispatch(setUserId(response.data?.userId));
+        dispatch(setUser(response.data?.Profile));
         navigate("/Game"); 
       } else {
         // console.error("Authentication failed:", response.data.result);

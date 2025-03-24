@@ -14,25 +14,26 @@ import { useDispatch } from 'react-redux';
 import Login from "./pages/Login";
 import { useEffect, useState } from 'react';
 import apiClient from './utils/apiClient';
-import { setUserId } from './services/redux/globalSlice';
+import { setUser} from './services/redux/globalSlice';
 import ProtectedRoute from './components/ProtectRoutes';
-import Loader from './components/loader'; // Import a Loader Component
+import Loader from './components/loader'; 
 import Footer from './components/Footer';
 function App() {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true); 
 
   const verifyToken = async () => {
     try {
       const response = await apiClient.get("/verifyToken");
-      console.log(response)
+    
       if (response.data?.success) {
-        dispatch(setUserId(getUserID()));
+        console.log(response.data);
+        dispatch(setUser(response.data.Profile));
       }
     } catch (err) {
       console.log("Token verification failed:", err);
     } finally {
-      setLoading(false); // Stop loading once verification is complete
+      setLoading(false); 
     }
   };
 

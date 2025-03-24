@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeToken } from "../services/authService";
-import { setUser, setUserId } from "../services/redux/globalSlice";
+import { setUser, } from "../services/redux/globalSlice";
 import apiClient from "../utils/apiClient";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user) || {
-    name: "JohnDoe123",
+  const user = useSelector((state) => state.auth?.User) || {
+    userame: "JohnDoe123",
     score: 2450,
-    image: "https://via.placeholder.com/150",
+    imageUrl: "https://via.placeholder.com/150",
   };
 
 
-  const [name, setName] = useState(user.name);
-  const [score, setScore] = useState(user.score);
-  const [image, setImage] = useState(user.image);
+  const [name, setName] = useState(user?.username);
+  const [score, setScore] = useState(user?.score);
+  const [image, setImage] = useState(user?.imageUrl);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -39,8 +39,7 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     removeToken();
-    dispatch(setUserId(null));
-    dispatch(setUser(null)); 
+    dispatch(setUser({})); 
   };
 
   return (
@@ -55,8 +54,8 @@ const ProfilePage = () => {
 
       
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-black mb-2">{user.name}</h1>
-          <p className="text-gray-600">Score: <span className="font-semibold">{user.score}</span></p>
+          <h1 className="text-2xl font-bold text-black mb-2">{user.username}</h1>
+          <p className="text-gray-600">Score: <span className="font-semibold">{user.score||0}</span></p>
         </div>
 
         <div className="space-y-3">
@@ -65,13 +64,6 @@ const ProfilePage = () => {
             value={name} 
             onChange={(e) => setName(e.target.value)} 
             placeholder="Enter new name"
-            className="w-full p-2 border rounded"
-          />
-          <input 
-            type="number" 
-            value={score} 
-            onChange={(e) => setScore(e.target.value)} 
-            placeholder="Enter new score"
             className="w-full p-2 border rounded"
           />
           <input 
