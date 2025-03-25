@@ -1,6 +1,8 @@
 
 # Multiplayer Game Platform
 
+## Deploy Project Link-: https://gamezone-avan.netlify.app
+
 ## Overview
 The Multiplayer Game Platform is an interactive gaming application that enables real-time multiplayer gameplay using **React, Node.js, and Socket.io**. It includes features like **user authentication, video calling, seamless communication**, and a **rating system with relative ranking and penalties**. The platform is designed to be **scalable, bandwidth-efficient, and concurrency-optimized**, with ongoing improvements for a more user-friendly experience.
 
@@ -36,7 +38,7 @@ The Multiplayer Game Platform is an interactive gaming application that enables 
 - **Real-time Communication:** Socket.io, WebRTC
 - **Database:** MongoDB
 - **Authentication:** JWT (JSON Web Token)
-- **Deployment:** Docker, AWS/GCP (Future enhancement)
+
 
 ## Installation & Setup
 ### Prerequisites
@@ -48,8 +50,8 @@ Ensure you have the following installed:
 ### Steps to Run Locally
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/multiplayer-game.git
-   cd multiplayer-game
+   git clone https://github.com/avansingh085/Game_Application.git
+   cd Game-Application
    ```
 2. Install dependencies:
    ```bash
@@ -57,15 +59,10 @@ Ensure you have the following installed:
    # or
    yarn install
    ```
-3. Start the backend server:
-   ```bash
-   cd server
-   npm start
-   ```
 4. Start the frontend:
    ```bash
-   cd client
-   npm start
+  
+   npm run dev
    ```
 5. Open the app in your browser at `http://localhost:3000`
 
