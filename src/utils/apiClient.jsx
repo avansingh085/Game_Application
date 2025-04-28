@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: "https://game-backend-28ge.onrender.com",
+  // baseURL: "https://game-backend-28ge.onrender.com",
+  baseURL:"http://localhost:3001"
 });
 apiClient.interceptors.request.use(async (config) => {
   const token =await localStorage.getItem('authToken');

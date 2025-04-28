@@ -30,7 +30,7 @@ const AuthForm = () => {
     if (!validateForm()) return;
 
     try {
-      let response = await apiClient.post(isLogin ? "/api/auth/login" : "/api/user/register", {
+      let response = await apiClient.post(isLogin ? "/api/auth/login" : "/api/auth/register", {
         email,
         password,
         ...(isLogin ? {} : { name }), 

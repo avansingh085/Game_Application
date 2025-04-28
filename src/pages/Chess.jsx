@@ -339,6 +339,7 @@ const handleSelect = async (row, col) => {
       setShowOptionPawn([true, "", row, col, newBoard]);
     }
 
+
     newBoard[selectedPiece.row][selectedPiece.col] = "";
     setBoard(newBoard);
     setSelectedPiece(null);
