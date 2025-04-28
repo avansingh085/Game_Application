@@ -301,7 +301,7 @@ useEffect(() => {
   newSocket.on("move", ({ board: newBoard, symbol }) => {
    
     setBoard(newBoard);
-    setTurn(symbol)
+    setTurn(symbol);
   
   });
 

@@ -7,7 +7,7 @@ const Leaderboard = () => {
   console.log(leaderboardData)
   const fetchData = async () => {
     try {
-      const response = await apiClient.get("/getLeaderboard");
+      const response = await apiClient.get("/api/user/getLeaderboard");
      // console.log(response.data,"AVANISH")
       if (response.data?.success) {
         setLeaderboardData(response.data.leaderboard);

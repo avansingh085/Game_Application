@@ -23,7 +23,7 @@ const ProfilePage = () => {
     setLoading(true);
     setMessage("");
     try {
-      const res = await apiClient.post("/updateProfile", { name, score, image,_id:user._id });
+      const res = await apiClient.post("/api/user/updateProfile", { name, score, image,_id:user._id });
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         setMessage("Profile updated successfully!");

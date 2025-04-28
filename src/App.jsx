@@ -24,7 +24,7 @@ function App() {
   
   const verifyToken = async () => {
     try {
-      const response = await apiClient.get("/verifyToken");
+      const response = await apiClient.get("/api/auth/verifyToken");
      
       if (response.data?.success) {
         console.log(response.data);
