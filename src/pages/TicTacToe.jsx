@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import GameEndTicTacToe from "../components/GameEndTicTacToe";
 const TicTacToe = ({ isOffline }) => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXTurn, setIsXTurn] = useState(true);
@@ -159,6 +159,7 @@ const TicTacToe = ({ isOffline }) => {
     } else if (!isXTurn && !winner && !isOnline) {
       makeOptimalComputerMove();
     }
+ 
   }, [board, isXTurn, winner, isOnline]);
 
   return (
@@ -223,6 +224,9 @@ const TicTacToe = ({ isOffline }) => {
       <button onClick={resetGame} className="mt-8 px-6 py-3 text-white bg-red-500 font-semibold rounded-full">
         Reset Game
       </button>
+      {
+        winner&&<GameEndTicTacToe onRematch={resetGame} score={0} onClose={setWinner} isWin={winner}/>
+      }
     </div>
   );
 };
