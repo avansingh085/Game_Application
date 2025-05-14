@@ -7,7 +7,7 @@ function GameEndTicTacToe({ isWin, score, onClose ,onRematch ,playerSymbol}) {
     useEffect(()=>{
       const addScore=async ()=>{
         try{
-           let res=await apiClient("/addScore",{score:displayScore,id:User._id});
+           let res=await apiClient("/updateScore",{score:displayScore,id:User._id});
            if(res.data.success)
            {
 
