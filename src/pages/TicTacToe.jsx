@@ -225,7 +225,7 @@ const TicTacToe = ({ isOffline }) => {
         Reset Game
       </button>
       {
-        winner&&<GameEndTicTacToe onRematch={resetGame} score={0} onClose={setWinner} isWin={winner}/>
+        winner&&<GameEndTicTacToe onRematch={resetGame} score={0} onClose={setWinner} isWin={winner} className={playerSymbol}/>
       }
     </div>
   );
