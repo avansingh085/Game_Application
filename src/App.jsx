@@ -42,7 +42,7 @@ function App() {
         <Route path="/About" element={<About />} />
         <Route path="/LeaderBoard" element={<LeaderBoard />} />
         <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/Login" element={<ProtectedRoute><Game /></ProtectedRoute>}  />
+        <Route path="/Login" element={<Login />}  />
       </Routes>
       <ToastContainer
         position="top-right"

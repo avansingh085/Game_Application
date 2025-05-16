@@ -26,7 +26,7 @@ const AuthForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 const login=useSelector((state)=>state.user.isLogin)
-const loading=useSelector((state).user.loading)
+const loading=useSelector((state)=>state.user.loading)
  
   const handleSubmit = async (e) => {
     e.preventDefault();
