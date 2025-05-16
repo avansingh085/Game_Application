@@ -3,16 +3,21 @@ import io from "socket.io-client";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GameEndTicTacToe from "../components/GameEndTicTacToe";
+import { useDispatch, useSelector } from "react-redux";
+import { setOnline } from "../services/redux/globalSlice";
+import Toast from "../components/Toast";
 const TicTacToe = ({ isOffline }) => {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXTurn, setIsXTurn] = useState(true);
   const [winner, setWinner] = useState(null);
   const [isOnline, setIsOnline] = useState(!isOffline);
-  const [playerSymbol, setPlayerSymbol] = useState(null);
+  const [playerSymbol, setPlayerSymbol] = useState('X');
   const [gameId, setGameId] = useState(null);
   const [socket, setSocket] = useState(null);
   const [userName, setUserName] = useState("");
-
+  const dispatch = useDispatch();
+  const User = useSelector((state) => state.auth.User)
+  const Opponent = useSelector((state) => state.auth.isOnlinePlay);
   const calculateWinner = (squares) => {
     const lines = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -49,6 +54,8 @@ const TicTacToe = ({ isOffline }) => {
     setBoard(Array(9).fill(null));
     setIsXTurn(true);
     setWinner(null);
+   
+    
 
     if (isOnline && socket) {
       socket.emit("reset", { gameId });
@@ -119,16 +126,23 @@ const TicTacToe = ({ isOffline }) => {
   };
 
   useEffect(() => {
-    if (!isOnline || !userName) return;
+    if (!isOnline||socket) return;
 
-    const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: userName, gameType: "TIC" } });
+    const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: User._id, gameType: "TIC" } });
     setSocket(newSocket);
 
-    newSocket.emit("join", { board });
+    newSocket.emit("join", { board, User });
 
     newSocket.on("waiting", (message) => toast.info(message));
     newSocket.on("startGame", ({ gameId, players }) => {
       const assignedSymbol = players.X.socketId === newSocket.id ? "X" : "O";
+      console.log(players)
+      if (players.X.socketId === newSocket.id) {
+        dispatch(setOnline(players.O.User));
+      }
+      else {
+        dispatch(setOnline(players.X.User));
+      }
       setPlayerSymbol(assignedSymbol);
       setGameId(gameId);
       toast.success(`Game started! You are ${assignedSymbol}`);
@@ -144,23 +158,29 @@ const TicTacToe = ({ isOffline }) => {
     newSocket.on("opponentDisconnected", (message) => {
       toast.error(message);
       resetGame();
+      dispatch(setOnline({}));
       setIsOnline(false);
     });
 
     return () => {
       newSocket.disconnect();
     };
-  }, [isOnline, userName]);
+  }, [isOnline, User]);
 
   useEffect(() => {
     const win = calculateWinner(board);
     if (win) {
       setWinner(win);
+      
     } else if (!isXTurn && !winner && !isOnline) {
       makeOptimalComputerMove();
     }
- 
+    if (!isOnline) {
+      dispatch(setOnline({}));
+    }
+
   }, [board, isXTurn, winner, isOnline]);
+
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-indigo-500 to-purple-600 flex flex-col items-center justify-center py-8">
@@ -173,6 +193,20 @@ const TicTacToe = ({ isOffline }) => {
             Turn: {isXTurn ? "X" : "O"} {isOnline && `(You are ${playerSymbol})`}
           </span>
         )}
+        {Opponent?.name && (
+          <div className="flex items-center space-x-3 bg-gray-100 p-3 rounded-md shadow-sm">
+            <span className="text-gray-700 font-semibold">Opponent:</span>
+            <img
+              src={Opponent.imageUrl}
+              alt={`${Opponent.name} avatar`}
+              className="h-10 w-10 rounded-full object-cover border-2 border-indigo-500"
+            />
+            <div className="text-gray-900 font-medium">
+              {Opponent.name} <span className="text-indigo-600 font-bold">: {Opponent.score}</span>
+            </div>
+          </div>
+        )}
+
       </div>
 
       <div className="flex space-x-6 mb-8">
@@ -187,33 +221,26 @@ const TicTacToe = ({ isOffline }) => {
         </button>
         <button
           onClick={() => {
-            if (!userName) {
-              toast.error("Enter a username before playing online!");
-              return;
-            }
-            setIsOnline(true);
+
+            setIsOnline(!isOnline);
             resetGame();
           }}
-          className="px-6 py-3 text-xl font-semibold rounded-full bg-green-500 text-white shadow-lg hover:bg-green-700"
+          className={`px-6 py-3 text-xl font-semibold rounded-full ${isOnline ? 'bg-white text-black' : 'bg-green-500 text-white'}  shadow-lg hover:bg-green-700`}
         >
-          Play Online
+          {
+            isOnline ? 'Play Offline' : 'Play Online'
+          }
         </button>
       </div>
 
-      <input
-        type="text"
-        className="h-10 w-72 mb-10 p-2 rounded-lg text-center"
-        placeholder="Enter username"
-        onChange={(e) => setUserName(e.target.value)}
-      />
+
 
       <div className="grid grid-cols-3 gap-4 w-72 mb-8">
         {board.map((cell, index) => (
           <div
             key={index}
-            className={`w-20 h-20 flex items-center justify-center border-4 border-gray-200 rounded-xl bg-white hover:bg-gray-100 ${
-              cell === "X" ? "text-blue-500" : "text-red-500"
-            }`}
+            className={`w-20 h-20 flex items-center justify-center border-4 border-gray-200 rounded-xl bg-white hover:bg-gray-100 ${cell === "X" ? "text-blue-500" : "text-red-500"
+              }`}
             onClick={() => handleMove(index)}
           >
             {cell}
@@ -225,7 +252,7 @@ const TicTacToe = ({ isOffline }) => {
         Reset Game
       </button>
       {
-        winner&&<GameEndTicTacToe onRematch={resetGame} score={0} onClose={setWinner} isWin={winner} className={playerSymbol}/>
+        winner && <GameEndTicTacToe onRematch={resetGame} score={0} onClose={setWinner} isWin={winner} playerSymbol={playerSymbol} setOnline={setIsOnline}/>
       }
     </div>
   );

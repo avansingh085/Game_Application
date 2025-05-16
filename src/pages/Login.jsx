@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { setUser } from '../services/redux/globalSlice';
 import apiClient from '../utils/apiClient';
-import { setToken,setUserID } from '../services/authService';
+import { setToken, setUserID } from '../services/authService';
+import Toast from '../components/Toast';
 
 const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -33,19 +34,21 @@ const AuthForm = () => {
       let response = await apiClient.post(isLogin ? "/api/auth/login" : "/api/auth/register", {
         email,
         password,
-        ...(isLogin ? {} : { name }), 
+        ...(isLogin ? {} : { name }),
       });
-    console.log(response.data)
+      console.log(response.data)
       if (response.data.success) {
         setToken(response.data.token);
-       
+        Toast.Success('login successfully!')
+      
         dispatch(setUser(response.data?.Profile));
-        navigate("/Game"); 
+        navigate("/Game");
       } else {
+        Toast.Fail('fail to login');
         // console.error("Authentication failed:", response.data.result);
       }
     } catch (error) {
-    console.log(error);
+      console.log(error);
     }
   };
 

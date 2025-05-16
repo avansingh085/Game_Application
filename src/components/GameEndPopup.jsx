@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const GameEndPopup = ({ socket, gameId,userId, gameResult,onRematch }) => {
-   
-   
+const GameEndPopup = ({ socket, gameId, userId, gameResult, onRematch }) => {
+
+
     const handleRematch = () => {
         socket.emit('reset', { gameId, userId });
         setIsOpen(false);
@@ -11,7 +11,7 @@ const GameEndPopup = ({ socket, gameId,userId, gameResult,onRematch }) => {
     };
     const getTitle = () => {
         if (gameResult.type === 'checkmate') {
-            return gameResult.winner  ? "Victory!" : "Checkmate!";
+            return gameResult.winner ? "Victory!" : "Checkmate!";
         }
         return "Game Drawn!";
     };
@@ -39,7 +39,7 @@ const GameEndPopup = ({ socket, gameId,userId, gameResult,onRematch }) => {
 
     return (
         <AnimatePresence>
-            {gameResult.type&& (
+            {gameResult.type && (
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -60,13 +60,13 @@ const GameEndPopup = ({ socket, gameId,userId, gameResult,onRematch }) => {
                             </div>
                             {gameResult.type === 'checkmate' && (
                                 <div className="text-lg">
-                                    {gameResult.winner 
+                                    {gameResult.winner
                                         ? "Congratulations!"
                                         : "Better luck next time!"}
                                 </div>
                             )}
                         </div>
-                       
+
                         <div className="flex flex-col gap-4">
                             <button
                                 onClick={handleRematch}
