@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-   baseURL: "https://game-backend-28ge.onrender.com",
-  // baseURL: 'http://localhost:3001'
+  //  baseURL: "https://game-backend-28ge.onrender.com",
+   baseURL: 'http://localhost:3001'
 
 });
 apiClient.interceptors.request.use(async (config) => {

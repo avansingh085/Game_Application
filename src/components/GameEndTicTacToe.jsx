@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import apiClient from "../utils/apiClient";
 import { useSelector } from 'react-redux';
-import { setOnline, setUser } from "../services/redux/globalSlice";
+import { setOnline, setUser } from "../services/redux/userSlice";
 function GameEndTicTacToe({ isWin, score, onClose, onRematch, playerSymbol ,setOnline}) {
-   const User = useSelector((state) => state.auth.User);
-   const Opponent=useSelector((state)=>state.auth.isOnlinePlay);
+   const User = useSelector((state) => state.user.User);
+   const Opponent=useSelector((state)=>state.user.isOnlinePlay);
    let displayScore
    if(Opponent?.name)
    {

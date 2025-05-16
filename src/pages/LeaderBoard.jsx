@@ -1,27 +1,32 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import apiClient from '../utils/apiClient';
+import Loader from '../components/loader';
 const Leaderboard = () => {
- 
+
   const [leaderboardData, setLeaderboardData] = useState([])
+  const [loading, setLoading] = useState(false);
   console.log(leaderboardData)
   const fetchData = async () => {
+    setLoading(true);
     try {
+
       const response = await apiClient.get("/api/user/getLeaderboard");
-     // console.log(response.data,"AVANISH")
+      // console.log(response.data,"AVANISH")
       if (response.data?.success) {
         setLeaderboardData(response.data.leaderboard);
       }
     } catch (err) {
       console.log("Leaderboard fetch error:", err);
     }
+    setLoading(false);
   };
-  useEffect(()=>{
-    
-    fetchData();
-  },[])
+  useEffect(() => {
 
-   
+    fetchData();
+  }, [])
+
+
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center py-12 px-4">
       <div className="w-full max-w-4xl bg-gray-900 p-8 rounded-xl shadow-2xl border border-gray-800">
@@ -39,15 +44,15 @@ const Leaderboard = () => {
               </tr>
             </thead>
             <tbody>
-              {leaderboardData.map((
-               player,
+              {!loading&&leaderboardData.map((
+                player,
                 index
 
               ) => (
-                <tr 
+                <tr
                   key={
                     player._id
-                  } 
+                  }
                   className="border-b border-gray-800 hover:bg-gray-800 transition-colors"
                 >
                   <td className="py-4 px-6 font-mono text-purple-300">#{
@@ -57,10 +62,11 @@ const Leaderboard = () => {
                     {player.score}
                   </td>
                 </tr>
-              ))}
+              )) }
             </tbody>
           </table>
         </div>
+        { loading&&<div className='h-64 w-full grid justify-center items-center '><Loader /></div>}
       </div>
     </div>
   );

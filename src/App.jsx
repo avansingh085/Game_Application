@@ -10,7 +10,7 @@ import Profile from './pages/Profile';
 import Chess from './pages/Chess';
 import About from './pages/About';
 import {  getToken, getUserID } from './services/authService';
-import { useDispatch } from 'react-redux';
+import { useDispatch,useSelector } from 'react-redux';
 import Login from "./pages/Login";
 import { useEffect, useState } from 'react';
 import apiClient from './utils/apiClient';
@@ -18,31 +18,17 @@ import { setUser} from './services/redux/globalSlice';
 import ProtectedRoute from './components/ProtectRoutes';
 import Loader from './components/loader'; 
 import Footer from './components/Footer';
+import { fetchUser } from './services/redux/userSlice';
 function App() {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true); 
   
-  const verifyToken = async () => {
-    try {
-      const response = await apiClient.get("/api/auth/verifyToken");
-     
-      if (response.data?.success) {
-        console.log(response.data);
-        dispatch(setUser(response.data.Profile));
-      }
-    } catch (err) {
-      console.log("Token verification failed:", err);
-    } finally {
-      setLoading(false); 
-    }
-  };
- 
+  const {loading,User,isLogin}=useSelector((state)=>state.user);
   useEffect(() => {
-    verifyToken();
+    dispatch(fetchUser());
   }, []);
 
   if (loading) {
-    return <Loader />; // Show loader until the authentication check is done
+    return <Loader />;
   }
 
   return (
@@ -56,7 +42,7 @@ function App() {
         <Route path="/About" element={<About />} />
         <Route path="/LeaderBoard" element={<LeaderBoard />} />
         <Route path="/Profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        <Route path="/Login" element={<Login />} />
+        <Route path="/Login" element={<ProtectedRoute><Game /></ProtectedRoute>}  />
       </Routes>
       <ToastContainer
         position="top-right"

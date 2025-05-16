@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setUser } from '../services/redux/globalSlice';
+import { setUser } from '../services/redux/userSlice';
 import apiClient from '../utils/apiClient';
 import { setToken, setUserID } from '../services/authService';
 import Toast from '../components/Toast';
@@ -25,7 +25,9 @@ const AuthForm = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
+const login=useSelector((state)=>state.user.isLogin)
+const loading=useSelector((state).user.loading)
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;

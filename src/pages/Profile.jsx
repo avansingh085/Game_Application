@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeToken } from "../services/authService";
-import { setUser, } from "../services/redux/globalSlice";
+import { setUser, } from "../services/redux/userSlice";
 import apiClient from "../utils/apiClient";
-
+import Progress from "../components/Progress";
 const ProfilePage = () => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth?.User) || {
+  const user = useSelector((state) => state.user?.User) || {
     name: "JohnDoe123",
     score: 2450,
     imageUrl: "https://via.placeholder.com/150",
@@ -18,6 +18,7 @@ const ProfilePage = () => {
   const [score, setScore] = useState(user?.score);
   const [image, setImage] = useState(user?.imageUrl);
   const [loading, setLoading] = useState(false);
+  const [showProgress,setShowProgress]=useState(false);
   const [message, setMessage] = useState("");
   const updateProfile = async () => {
     setLoading(true);
@@ -45,7 +46,8 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
       <div className="max-w-sm w-full bg-white rounded-lg shadow-lg p-6">
-       
+        <button className="bg-blue-500 rounded-md text-white hover:bg-blue-600 h-10 w-32" onClick={()=>setShowProgress(!showProgress)}>showProgress</button>
+       {showProgress&&<Progress showProgress={showProgress} setShowProgress={setShowProgress}/>}
         <div className="flex justify-center mb-4">
           <div className="relative w-32 h-32 rounded-full overflow-hidden border-4 border-black">
             <img src={image} alt="Profile" className="w-full h-full object-cover" />
@@ -83,7 +85,7 @@ const ProfilePage = () => {
           >
             {loading ? "Updating..." : "Update Profile"}
           </button>
-
+        
           <button
             onClick={handleLogout}
             className="w-full py-2 px-4 border-2 border-black rounded-md text-black font-semibold 

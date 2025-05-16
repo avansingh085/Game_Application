@@ -279,7 +279,7 @@ const ChessGame = () => {
     newSocket.on("startGame", ({ gameId, players }) => {
       console.log(gameId, players)
       const assignedSymbol = players.X.socketId === newSocket.id ? "b" : "w";
-
+      // dispatch(setOnline)
       setOnlineTurn(assignedSymbol)
       setGameId(gameId);
       toast.success(`Game started! You are ${assignedSymbol}`);

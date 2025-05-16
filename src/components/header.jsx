@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-   const isLogin=useSelector((state)=>state.auth.isLogin);
+   const isLogin=useSelector((state)=>state.user.isLogin);
    
   return (
     <header className="bg-black m-0 p-0 text-white shadow-lg">

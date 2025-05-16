@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GameEndTicTacToe from "../components/GameEndTicTacToe";
 import { useDispatch, useSelector } from "react-redux";
-import { setOnline } from "../services/redux/globalSlice";
+import { setOnline } from "../services/redux/userSlice";
 import Toast from "../components/Toast";
 const TicTacToe = ({ isOffline }) => {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -17,7 +17,7 @@ const TicTacToe = ({ isOffline }) => {
   const [userName, setUserName] = useState("");
   const dispatch = useDispatch();
   const User = useSelector((state) => state.auth.User)
-  const Opponent = useSelector((state) => state.auth.isOnlinePlay);
+  const Opponent = useSelector((state) => state.user.isOnlinePlay);
   const calculateWinner = (squares) => {
     const lines = [
       [0, 1, 2], [3, 4, 5], [6, 7, 8],
@@ -128,7 +128,7 @@ const TicTacToe = ({ isOffline }) => {
   useEffect(() => {
     if (!isOnline||socket) return;
 
-    const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: User._id, gameType: "TIC" } });
+    const newSocket = io("http://localhost:3001", { query: { id: User._id, gameType: "TIC" } });
     setSocket(newSocket);
 
     newSocket.emit("join", { board, User });
