@@ -66,7 +66,7 @@ const Leaderboard = () => {
             </tbody>
           </table>
         </div>
-        { loading&&<div className='h-64 w-full grid justify-center items-center '><Loader /></div>}
+        { loading&&<div className='h-64 w-full grid justify-center items-center '>Loading...</div>}
       </div>
     </div>
   );
