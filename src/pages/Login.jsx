@@ -37,7 +37,7 @@ const loading=useSelector((state)=>state.user.loading)
     if (!validateForm()) return;
 
     try {
-      fetchAuth(true);
+      
       let response = await apiClient.post(isLogin ? "/api/auth/login" : "/api/auth/register", {
         email,
         password,
@@ -56,8 +56,6 @@ const loading=useSelector((state)=>state.user.loading)
       }
     } catch (error) {
       console.log(error);
-    }finally{
-      setfetchAuth(false);
     }
   };
 
@@ -134,7 +132,7 @@ const loading=useSelector((state)=>state.user.loading)
             <div>
               <button
                 type="submit"
-                disabled={fetchAuth}
+               
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
                 {isLogin ? 'Sign in' : 'Sign up'}
