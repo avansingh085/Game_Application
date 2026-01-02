@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Mail, ShieldCheck, Lock, ArrowLeft, Loader2 } from 'lucide-react';
 import AuthInput from './AuthInput';
 import apiClient from '../utils/apiClient';
@@ -9,9 +9,9 @@ const ForgotPassword = ({ onBack }) => {
   const [loading, setLoading] = useState(false);
   const [vals, setVals] = useState({ email: '', otp: '', pass: '', confirm: '' });
 
-  const handleChange = (field, value) => {
-    setVals(prev => ({ ...prev, [field]: value }));
-  };
+  const handleChange = useCallback((field, value) => {
+    setVals(prev => (prev[field] === value ? prev : { ...prev, [field]: value }));
+  }, []);
 
   const handleProcess = async (e) => {
     e.preventDefault();
@@ -105,6 +105,7 @@ const ForgotPassword = ({ onBack }) => {
 
         <button 
           disabled={loading}
+          type="submit"
           className="w-full bg-black text-white py-3 rounded-xl font-bold transition-all active:scale-95 disabled:opacity-50"
         >
           {loading ? <Loader2 className="animate-spin mx-auto" /> : "Continue"}
@@ -114,4 +115,4 @@ const ForgotPassword = ({ onBack }) => {
   );
 };
 
-export default ForgotPassword;
+export default memo(ForgotPassword);
