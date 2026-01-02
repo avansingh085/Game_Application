@@ -12,72 +12,72 @@ import RegisterForm from '../components/RegisterForm';
 import ForgotPassword from '../components/ForgotPassword';
 
 const AuthPage = () => {
-  // const [view, setView] = useState('login'); // 'login' | 'register' | 'forgot'
-  // const [formData, setFormData] = useState({
-  //   name: '',
-  //   email: 'test@gmail.com',
-  //   password: 'test1234',
-  //   confirmPassword: ''
-  // });
-  // const [errors, setErrors] = useState({});
-  // const [isSubmitting, setIsSubmitting] = useState(false);
+  const [view, setView] = useState('login'); // 'login' | 'register' | 'forgot'
+  const [formData, setFormData] = useState({
+    name: '',
+    email: 'test@gmail.com',
+    password: 'test1234',
+    confirmPassword: ''
+  });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
-  // const { isLogin: isLoggedIn } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLogin: isLoggedIn } = useSelector((state) => state.user);
 
-  // useEffect(() => {
-  //   if (isLoggedIn) navigate('/Game');
-  // }, [isLoggedIn, navigate]);
+  useEffect(() => {
+    if (isLoggedIn) navigate('/Game');
+  }, [isLoggedIn, navigate]);
 
-  // const handleChange = (e) => {
-  //   setFormData({ ...formData, [e.target.name]: e.target.value });
-  //   if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' });
-  // };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: '' });
+  };
 
-  // const validateForm = () => {
-  //   const newErrors = {};
-  //   if (!formData.email) newErrors.email = 'Email is required';
-  //   if (!formData.password) newErrors.password = 'Password is required';
-  //   if (view === 'register' && formData.password !== formData.confirmPassword) {
-  //     newErrors.confirmPassword = 'Passwords do not match';
-  //   }
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email) newErrors.email = 'Email is required';
+    if (!formData.password) newErrors.password = 'Password is required';
+    if (view === 'register' && formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   if (!validateForm()) return;
-  //   setIsSubmitting(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    setIsSubmitting(true);
 
-  //   try {
-  //     const endpoint = view === 'login' ? "/api/auth/login" : "/api/auth/register";
-  //     const payload = view === 'login' 
-  //       ? { email: formData.email, password: formData.password }
-  //       : { name: formData.name, email: formData.email, password: formData.password };
+    try {
+      const endpoint = view === 'login' ? "/api/auth/login" : "/api/auth/register";
+      const payload = view === 'login' 
+        ? { email: formData.email, password: formData.password }
+        : { name: formData.name, email: formData.email, password: formData.password };
 
-  //     const response = await apiClient.post(endpoint, payload);
+      const response = await apiClient.post(endpoint, payload);
       
-  //     if (response.data.success) {
-  //       if (view === 'login') {
-  //         //setToken(response.data.token);
-  //         dispatch(setUser(response.data?.Profile));
-  //         Toast.Success('Welcome back!');
-  //         navigate("/Game");
-  //       } else {
-  //         Toast.Success('Account created! Please login.');
-  //         setView('login');
-  //       }
-  //     } else {
-  //       Toast.Fail(response.data.message || 'Authentication failed');
-  //     }
-  //   } catch (error) {
-  //     Toast.Fail('Network error. Please try again.');
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
+      if (response.data.success) {
+        if (view === 'login') {
+          //setToken(response.data.token);
+          dispatch(setUser(response.data?.Profile));
+          Toast.Success('Welcome back!');
+          navigate("/Game");
+        } else {
+          Toast.Success('Account created! Please login.');
+          setView('login');
+        }
+      } else {
+        Toast.Fail(response.data.message || 'Authentication failed');
+      }
+    } catch (error) {
+      Toast.Fail('Network error. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-black flex items-center justify-center p-4">
