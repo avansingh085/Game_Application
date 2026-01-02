@@ -73,7 +73,8 @@ const AuthPage = () => {
         Toast.Fail(response.data.message || 'Authentication failed');
       }
     } catch (error) {
-      Toast.Fail('Network error. Please try again.');
+      const message = err.response?.data?.message || err.message;
+      Toast.Fail(message);
     } finally {
       setIsSubmitting(false);
     }
