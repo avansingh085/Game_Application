@@ -12,7 +12,7 @@ import RegisterForm from '../components/RegisterForm';
 import ForgotPassword from '../components/ForgotPassword';
 
 const AuthPage = () => {
-  const [view, setView] = useState('login'); // 'login' | 'register' | 'forgot'
+  const [view, setView] = useState('login'); 
   const [formData, setFormData] = useState({
     name: '',
     email: 'test@gmail.com',
@@ -81,10 +81,10 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-slate-900 to-black flex items-center justify-center p-4">
-      {/* <div className="w-full max-w-md">
+      <div className="w-full max-w-md">
         <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden p-8">
-           */}
-          {/* {view === 'login' && (
+          
+          {view === 'login' && (
             <LoginForm 
               formData={formData} 
               handleChange={handleChange} 
@@ -112,7 +112,7 @@ const AuthPage = () => {
           )}
 
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
