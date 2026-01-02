@@ -14,7 +14,7 @@ const ForgotPassword = ({ onBack }) => {
     setLoading(true);
     try {
       if (step === 1) {
-        await apiClient.post('/api/auth/forgot-password', { email: vals.email });
+        await apiClient.post('/api/auth/send-otp', { email: vals.email,subject:'change password ' });
         setStep(2);
       } else if (step === 2) {
         await apiClient.post('/api/auth/verify-otp', { email: vals.email, otp: vals.otp });
