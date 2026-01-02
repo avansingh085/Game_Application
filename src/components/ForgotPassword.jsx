@@ -20,7 +20,7 @@ const ForgotPassword = ({ onBack }) => {
         await apiClient.post('/api/auth/verify-otp', { email: vals.email, otp: vals.otp });
         setStep(3);
       } else {
-        await apiClient.post('/api/auth/reset-password', { email: vals.email, password: vals.pass });
+        await apiClient.post('/api/auth/reset-password', { email: vals.email, newPassword: vals.pass,otp: vals.otp });
         Toast.Success("Password Reset!");
         onBack();
       }
