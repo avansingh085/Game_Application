@@ -270,7 +270,7 @@ const ChessGame = () => {
   useEffect(() => {
     if (!online || !userId) return;
 
-    const newSocket = io("https://game-backend-28ge.onrender.com", { query: { id: userId, gameType: "chess" } });
+    const newSocket = io(import.meta.env.VITE_BACKEND_URL.split('/')[0], { query: { id: userId, gameType: "chess" } });
     setSocket(newSocket);
 
     newSocket.emit("join", { board: initializeBoard() });

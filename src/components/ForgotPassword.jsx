@@ -14,13 +14,13 @@ const ForgotPassword = ({ onBack }) => {
     setLoading(true);
     try {
       if (step === 1) {
-        await apiClient.post('/api/auth/send-otp', { email: vals.email,subject:'change password ' });
+        await apiClient.post('/auth/send-otp', { email: vals.email,subject:'change password ' });
         setStep(2);
       } else if (step === 2) {
-        await apiClient.post('/api/auth/verify-otp', { email: vals.email, otp: vals.otp });
+        await apiClient.post('/auth/verify-otp', { email: vals.email, otp: vals.otp });
         setStep(3);
       } else {
-        await apiClient.post('/api/auth/reset-password', { email: vals.email, newPassword: vals.pass,otp: vals.otp });
+        await apiClient.post('/auth/reset-password', { email: vals.email, newPassword: vals.pass,otp: vals.otp });
         Toast.Success("Password Reset!");
         onBack();
       }

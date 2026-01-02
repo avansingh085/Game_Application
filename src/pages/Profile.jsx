@@ -4,6 +4,7 @@ import { removeToken } from "../services/authService";
 import { setUser, } from "../services/redux/userSlice";
 import apiClient from "../utils/apiClient";
 import Progress from "../components/Progress";
+import Toast from "../components/Toast";
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user?.User) || {
@@ -24,7 +25,7 @@ const ProfilePage = () => {
     setLoading(true);
     setMessage("");
     try {
-      const res = await apiClient.post("/api/user/updateProfile", { name, score, image,_id:user._id });
+      const res = await apiClient.post("/user/updateProfile", { name, score, image,_id:user._id });
       if (res.data.success) {
         dispatch(setUser(res.data.user));
         setMessage("Profile updated successfully!");
@@ -38,9 +39,18 @@ const ProfilePage = () => {
     setLoading(false);
   };
 
-  const handleLogout = () => {
-    removeToken();
-    dispatch(setUser({})); 
+  const handleLogout = async () => {
+     try{
+        const res=await apiClient.get('/auth/logout');
+        if(res.data.success)
+        {
+          Toast.Success('Logout!');
+        }
+     }
+     catch(err){
+            Toast.Fail('Failed to Logout!');
+            console.log(err);
+     }
   };
 
   return (

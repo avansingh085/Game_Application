@@ -20,7 +20,7 @@ function GameEndTicTacToe({ isWin, score, onClose, onRematch, playerSymbol ,setO
     const addScore = async () => {
       try {
         console.log( {  displayScore,User })
-        let res = await apiClient.post("/api/user/updateScore", { score: displayScore, id: User._id });
+        let res = await apiClient.post("/user/updateScore", { score: displayScore, id: User._id });
        
         if (res.data.success) {
            dispatch(setUser(res.data.User));

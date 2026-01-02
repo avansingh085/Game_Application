@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import apiClient from "../../utils/apiClient";
 export const fetchUser = createAsyncThunk('user/fetchUser', async (_, thunkAPI) => {
     try {
-        let response = await apiClient.get("/api/user/profile");
+        let response = await apiClient.get("/user/profile");
         return response.data.Profile;
 
     } catch (err) {

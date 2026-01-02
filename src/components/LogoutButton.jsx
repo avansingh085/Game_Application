@@ -5,10 +5,9 @@ import apiClient from '../utils/apiClient';
 const LogoutButton = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     
-    apiClient.post('/logout');
-    removeToken();
+   await apiClient.get('/api/logout');
     navigate('/login');
   };
   return (

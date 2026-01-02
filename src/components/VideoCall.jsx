@@ -101,7 +101,7 @@ const VideoCall = ({ roomId }) => {
 
   return (
     <div className="fixed inset-0 pointer-events-none">
-      {/* Local Video */}
+     
       <motion.video
         ref={localVideoRef}
         autoPlay
@@ -115,7 +115,7 @@ const VideoCall = ({ roomId }) => {
         style={{ width: "150px", height: "100px" }}
       />
 
-      {/* Remote Video */}
+     
       <motion.video
         ref={remoteVideoRef}
         autoPlay
@@ -128,7 +128,7 @@ const VideoCall = ({ roomId }) => {
         style={{ width: "150px", height: "100px" }}
       />
 
-      {/* Controls (Top-Right Corner) */}
+     
       <div className="fixed top-4 right-4 flex space-x-2 bg-black/50 p-2 rounded-lg pointer-events-auto">
         <button
           onClick={toggleMute}

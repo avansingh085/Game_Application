@@ -52,7 +52,7 @@ const AuthPage = () => {
     setIsSubmitting(true);
 
     try {
-      const endpoint = view === 'login' ? "/api/auth/login" : "/api/auth/register";
+      const endpoint = view === 'login' ? "/auth/login" : "/auth/register";
       const payload = view === 'login' 
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password };

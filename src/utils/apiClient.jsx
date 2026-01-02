@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://game-backend-28ge.onrender.com',
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   withCredentials: true, 
   headers: {
     'Content-Type': 'application/json',
