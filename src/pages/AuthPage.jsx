@@ -28,7 +28,7 @@ const AuthPage = () => {
 
   useEffect(() => {
     if (isLoggedIn) navigate('/Game');
-  }, [isLoggedIn]);
+  }, [isLoggedIn, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
