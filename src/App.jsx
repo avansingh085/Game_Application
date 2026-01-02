@@ -11,7 +11,7 @@ import Chess from './pages/Chess';
 import About from './pages/About';
 import {  getToken, getUserID } from './services/authService';
 import { useDispatch,useSelector } from 'react-redux';
-import Login from "./pages/Login";
+import Login from "./pages/AuthPage";
 import { useEffect, useState } from 'react';
 import apiClient from './utils/apiClient';
 import { setUser} from './services/redux/globalSlice';
