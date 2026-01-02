@@ -13,16 +13,11 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-   
-    if (
-      error.response?.status === 401 && 
-      !originalRequest._retry && 
-      !originalRequest.url.includes('/api/auth/refresh-token')
-    ) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
-      
+        
         const response = await axios.post(
           `${apiClient.defaults.baseURL}/api/auth/refresh-token`,
           {}, 
@@ -33,9 +28,9 @@ apiClient.interceptors.response.use(
           return apiClient(originalRequest);
         }
       } catch (refreshError) {
-       
-        console.error("Session expired. Redirecting to login...");
-       
+        
+        console.error("Session expired. Please login again.");
+        
         return Promise.reject(refreshError);
       }
     }
