@@ -19,7 +19,7 @@ apiClient.interceptors.response.use(
       try {
         
         const response = await axios.post(
-          `${apiClient.defaults.baseURL}/api/auth/refresh-token`,
+          `${apiClient.defaults.baseURL}/auth/refresh-token`,
           {}, 
           { withCredentials: true }
         );
