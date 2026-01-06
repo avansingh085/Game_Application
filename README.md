@@ -1,7 +1,7 @@
 
 # Multiplayer Game Platform
 
-## Deploy Project Link-: https://gamezone-avan.netlify.app
+## Deploy Project Link-: [https://gamezone-avan.netlify.app](https://game-application-blond.vercel.app/)
 
 ## Overview
 The Multiplayer Game Platform is an interactive gaming application that enables real-time multiplayer gameplay using **React, Node.js, and Socket.io**. It includes features like **user authentication, video calling, seamless communication**, and a **rating system with relative ranking and penalties**. The platform is designed to be **scalable, bandwidth-efficient, and concurrency-optimized**, with ongoing improvements for a more user-friendly experience.
